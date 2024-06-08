@@ -37,15 +37,13 @@ public class AsesorService {
     }
     
     public Optional<Asesor> obtenerAsesorPorUsuario(Usuario usuario) {
-        return asesorRepository.findByUsuario(usuario); // El repositorio debería estar devolviendo un Optional<Asesor>
+        return asesorRepository.findByUsuario(usuario);
     }
     
     public Asesor actualizarAsesor(Integer idAsesor, Asesor asesorActualizado) {
         return asesorRepository.findById(idAsesor)
                 .map(asesorExistente -> {
-                    // Actualizar los campos del asesor existente con los valores de asesorActualizado
                     asesorExistente.setEspecialidad(asesorActualizado.getEspecialidad());
-                    // ... (actualizar otros campos según sea necesario)
                     return asesorRepository.save(asesorExistente);
                 })
                 .orElseThrow(() -> new RuntimeException("Asesor no encontrado"));

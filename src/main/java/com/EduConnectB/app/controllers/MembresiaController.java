@@ -29,11 +29,11 @@ public class MembresiaController extends BaseController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Comprar membresía (simulación de pago)
+    // Comprar membresía (simulación de pago ya que no tenemos integrada una pasarela)
     @PostMapping("/comprar/prueba")
     public ResponseEntity<Membresia> comprarMembresiaPrueba(@Validated @RequestBody Membresia membresia, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(membresia); // Devuelve la membresía con los errores
+            return ResponseEntity.badRequest().body(membresia);
         }
 
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -41,16 +41,15 @@ public class MembresiaController extends BaseController {
             throw new AuthenticationRequiredException("No estás autenticado.");
         }
 
-        // Verificar si el usuario ya tiene una membresía activa (opcional)
+        // Verificar si el usuario ya tiene una membresía activa
         if (membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya tienes una membresía activa.");
         }
 
         membresia.setUsuario(usuarioAutenticado);
         membresia.setFechaInicio(LocalDate.now());
-        membresia.setFechaFin(LocalDate.now().plusMonths(1)); // Ejemplo: 1 mes de membresía
+        membresia.setFechaFin(LocalDate.now().plusMonths(1)); //  1 mes de membresía por defecto para las pruebas gentita
 
-        // Actualizar el tipo de usuario según la membresía comprada
         usuarioAutenticado.setTipoUsuario(membresia.getTipoMembresia().getTipoUsuarioAsociado());
         usuarioAutenticado.setEstado(EstadoUsuario.ACTIVO);
         usuarioService.guardarUsuario(usuarioAutenticado);
@@ -59,7 +58,6 @@ public class MembresiaController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaMembresia);
     }
 
-    // Verificar si el usuario tiene una membresía activa
     @GetMapping("/estado")
     public ResponseEntity<Boolean> tieneMembresiaActiva() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -71,7 +69,6 @@ public class MembresiaController extends BaseController {
         }
     }
 
-    // Obtener detalles de la membresía del usuario
     @GetMapping("/mi-membresia")
     public ResponseEntity<Membresia> obtenerMiMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -122,12 +119,10 @@ public class MembresiaController extends BaseController {
         }
     }
     
-    // Cancelar la membresía del usuario
     @DeleteMapping("/cancelar")
     public ResponseEntity<Void> cancelarMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         if (usuarioAutenticado != null) {
-            // Verificar si el usuario tiene una membresía activa para cancelar
             if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para cancelar.");
             }

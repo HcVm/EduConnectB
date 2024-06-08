@@ -21,7 +21,6 @@ public abstract class BaseController {
                 return ((EduConnectUserDetails) principal).getUsuario();
             }
         }
-        // Lanzar una excepción si el usuario no está autenticado
         throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
     }
     

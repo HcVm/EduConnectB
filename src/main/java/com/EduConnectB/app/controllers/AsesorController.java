@@ -49,7 +49,6 @@ public class AsesorController extends BaseController {
     @Autowired
     private ValoracionService valoracionService;
 
-    // Obtener información del asesor autenticado
     @GetMapping("/perfil")
     public ResponseEntity<Asesor> obtenerPerfil() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -73,7 +72,6 @@ public class AsesorController extends BaseController {
         }
     }
 
-    // Actualizar disponibilidad de horario
     @PutMapping("/{idAsesor}/horario")
     public ResponseEntity<Asesor> actualizarHorario(@PathVariable Integer idAsesor, @RequestBody String nuevoHorario) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -88,7 +86,6 @@ public class AsesorController extends BaseController {
         }
     }
 
-    // Obtener valoraciones del asesor
     @GetMapping("/{idAsesor}/valoraciones")
     public ResponseEntity<List<Valoracion>> obtenerValoraciones(@PathVariable Integer idAsesor) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -146,13 +143,10 @@ public class AsesorController extends BaseController {
         Usuario estudiante = usuarioService.obtenerUsuarioPorId(idEstudiante)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado."));
 
-        // Verificar si el asesor tuvo sesiones con el estudiante en el mes y año especificados
         YearMonth mesAnioInforme = YearMonth.of(anio, mes);
         if (!sesionService.asesorTuvoSesionesConEstudianteEnPeriodo(usuarioAutenticado.getIdUsuario(), idEstudiante, mesAnioInforme)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes ingresar un informe para este estudiante en este período.");
         }
-
-        // Crear y guardar el informe
         informe.setEstudiante(estudiante);
         informe.setMesAnio(mesAnioInforme);
         Informe nuevoInforme = informeService.guardarInforme(informe);

@@ -26,7 +26,7 @@ public class BibliotecaDigitalService {
     }
 	
 	public RecursoBiblioteca obtenerRecurso(String idRecurso) {
-        String apiUrl = "http://api-biblioteca-digital/recursos/" + idRecurso; // Reemplaza con la URL real
+        String apiUrl = "http://api-biblioteca-digital/recursos/" + idRecurso; //(recordatorio) Reemplaza con la URL real
         ResponseEntity<RecursoBiblioteca> response = restTemplate.getForEntity(apiUrl, RecursoBiblioteca.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {

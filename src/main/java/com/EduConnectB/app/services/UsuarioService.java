@@ -43,9 +43,7 @@ public class UsuarioService {
     public Usuario actualizarUsuario(Integer idUsuario, Usuario usuarioActualizado) {
         return usuarioRepository.findById(idUsuario)
                 .map(usuarioExistente -> {
-                    // Actualizar los campos del usuario existente con los valores de usuarioActualizado
                     usuarioExistente.setNombre(usuarioActualizado.getNombre());
-                    // ... (actualizar otros campos según sea necesario)
                     return usuarioRepository.save(usuarioExistente);
                 })
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

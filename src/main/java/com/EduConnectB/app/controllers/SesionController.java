@@ -39,21 +39,18 @@ public class SesionController extends BaseController {
     @Autowired
     private AsesorService asesorService;
 
-    // Crear una nueva sesión
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
     public ResponseEntity<Sesion> crearSesion(@Validated @RequestBody Sesion sesion, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Manejo de errores de validación
-            sesion.setErrores(bindingResult.getAllErrors()); // Agrega los errores a la sesión
-            return ResponseEntity.badRequest().body(sesion); // Devuelve la sesión con los errores
+            sesion.setErrores(bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(sesion);
         }
 
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         if (usuarioAutenticado == null) {
             throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
         }
-
         // Asignar el usuario o asesor autenticado a la sesión (según el rol)
         if (usuarioAutenticado.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
             sesion.setUsuario(usuarioAutenticado);
@@ -69,7 +66,6 @@ public class SesionController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
     }
 
-    // Obtener todas las sesiones (solo para administradores)
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Sesion>> obtenerTodasLasSesiones() {
@@ -77,7 +73,6 @@ public class SesionController extends BaseController {
         return ResponseEntity.ok(sesiones);
     }
 
-    // Obtener una sesión por ID
     @GetMapping("/{idSesion}")
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR', 'ADMIN')")
     public ResponseEntity<Sesion> obtenerSesionPorId(@PathVariable Integer idSesion) {
@@ -92,15 +87,13 @@ public class SesionController extends BaseController {
         return ResponseEntity.ok(sesion);
     }
 
-    // Actualizar una sesión existente
     @PutMapping("/{idSesion}")
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
     public ResponseEntity<Sesion> actualizarSesion(@PathVariable Integer idSesion,
             @Validated @RequestBody Sesion sesionActualizada, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Manejo de errores de validación
-            sesionActualizada.setErrores(bindingResult.getAllErrors()); // Agrega los errores a la sesión
-            return ResponseEntity.badRequest().body(sesionActualizada); // Devuelve la sesión con los errores
+            sesionActualizada.setErrores(bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(sesionActualizada);
         }
 
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -108,7 +101,6 @@ public class SesionController extends BaseController {
         return sesionService.obtenerSesionPorId(idSesion)
                 .map(sesion -> {
                     if (tienePermisoParaSesion(sesion, usuarioAutenticado)) {
-                        // Actualizar los campos permitidos de la sesión
                         sesion.setFechaHora(sesionActualizada.getFechaHora());
                         sesion.setEstado(sesionActualizada.getEstado());
                         return ResponseEntity.ok(sesionService.guardarSesion(sesion));
@@ -119,7 +111,6 @@ public class SesionController extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
     }
 
-    // Cancelar una sesión
     @DeleteMapping("/{idSesion}")
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
     public ResponseEntity<Void> cancelarSesion(@PathVariable Integer idSesion) {

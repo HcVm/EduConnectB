@@ -36,7 +36,6 @@ public class EstudianteController extends BaseController {
     @Autowired
     private BibliotecaDigitalService bibliotecaDigitalService;
 
-    // Obtener calificaciones del estudiante
     @GetMapping("/{idEstudiante}/calificaciones")
     public ResponseEntity<List<Calificacion>> obtenerCalificaciones(@PathVariable Integer idEstudiante) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -48,16 +47,14 @@ public class EstudianteController extends BaseController {
         }
     }
 
-    // Programar una sesión
     @PostMapping("/sesiones")
     public ResponseEntity<Sesion> programarSesion(@RequestBody Sesion sesion) {
         // Validar datos de la sesión (e.g., disponibilidad del asesor)
-        sesion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado a la sesión
+        sesion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado
         Sesion nuevaSesion = sesionService.guardarSesion(sesion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
     }
 
-    // Obtener sesiones programadas del estudiante
     @GetMapping("/{idEstudiante}/sesiones")
     public ResponseEntity<List<Sesion>> obtenerSesionesProgramadas(@PathVariable Integer idEstudiante) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -69,11 +66,10 @@ public class EstudianteController extends BaseController {
         }
     }
 
-    // Valorar una sesión
     @PostMapping("/sesiones/{idSesion}/valoraciones")
     public ResponseEntity<Valoracion> valorarSesion(@PathVariable Integer idSesion, @RequestBody Valoracion valoracion) {
         // Validar si el estudiante participó en la sesión y si ya la valoró
-        valoracion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado a la valoración
+        valoracion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado
         Valoracion nuevaValoracion = valoracionService.guardarValoracion(valoracion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaValoracion);
     }
