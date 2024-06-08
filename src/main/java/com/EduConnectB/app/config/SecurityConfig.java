@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/registro/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form // Nuevo estilo para formLogin
+            .formLogin(form -> form
                 .loginPage("/login")
                 .permitAll()
             )
