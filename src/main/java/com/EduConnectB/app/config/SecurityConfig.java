@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterAfter(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class); // <- Cambio aquí
+            .addFilterAfter(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);
 
         return http.build();
     }

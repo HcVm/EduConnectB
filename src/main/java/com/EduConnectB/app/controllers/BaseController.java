@@ -31,7 +31,7 @@ public abstract class BaseController {
     }
 	
 	@GetMapping("/current")
-    @PreAuthorize("isAuthenticated()") //Añade esta línea
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Usuario> obtenerUsuarioActual() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         return ResponseEntity.ok(usuarioAutenticado);

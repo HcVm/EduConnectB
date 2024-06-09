@@ -4,7 +4,6 @@ public class LoginRequest {
     private String correoElectronico;
     private String contrasena;
 
-    // Constructor, getters y setters
     public String getCorreoElectronico() {
         return correoElectronico;
     }

@@ -4,12 +4,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "jwt") // Puedes configurar estas propiedades en application.properties
+@ConfigurationProperties(prefix = "jwt")
 public class JwtConfig {
     private String secretKey;
     private long expirationMs;
 
-    // Getters y setters
     public String getSecretKey() {
         return secretKey;
     }

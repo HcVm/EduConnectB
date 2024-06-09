@@ -49,8 +49,7 @@ public class EstudianteController extends BaseController {
 
     @PostMapping("/sesiones")
     public ResponseEntity<Sesion> programarSesion(@RequestBody Sesion sesion) {
-        // Validar datos de la sesión (e.g., disponibilidad del asesor)
-        sesion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado
+        sesion.setUsuario(obtenerUsuarioAutenticado()); 
         Sesion nuevaSesion = sesionService.guardarSesion(sesion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
     }
@@ -68,14 +67,13 @@ public class EstudianteController extends BaseController {
 
     @PostMapping("/sesiones/{idSesion}/valoraciones")
     public ResponseEntity<Valoracion> valorarSesion(@PathVariable Integer idSesion, @RequestBody Valoracion valoracion) {
-        // Validar si el estudiante participó en la sesión y si ya la valoró
-        valoracion.setUsuario(obtenerUsuarioAutenticado()); // Asignar el usuario autenticado
+        valoracion.setUsuario(obtenerUsuarioAutenticado());
         Valoracion nuevaValoracion = valoracionService.guardarValoracion(valoracion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaValoracion);
     }
     
     @GetMapping("/biblioteca/{idRecurso}")
-    @PreAuthorize("hasAuthority('ESTUDIANTE_PRO')") // Solo estudiantes PRO tienen acceso
+    @PreAuthorize("hasAuthority('ESTUDIANTE_PRO')")
     public ResponseEntity<?> obtenerRecursoBiblioteca(@PathVariable String idRecurso) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
 
