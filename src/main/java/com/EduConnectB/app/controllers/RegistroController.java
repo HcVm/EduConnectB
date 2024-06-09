@@ -52,7 +52,7 @@ public class RegistroController {
         }
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         usuario.setTipoUsuario(TipoUsuario.ESTUDIANTE);
-        usuario.setEstado(EstadoUsuario.PENDIENTE_PAGO);
+        usuario.setEstado(EstadoUsuario.ACTIVO);
         Usuario nuevoUsuario = usuarioService.guardarUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
     }
@@ -76,7 +76,7 @@ public class RegistroController {
         }
         asesor.getUsuario().setContrasena(passwordEncoder.encode(asesor.getUsuario().getContrasena()));
         asesor.getUsuario().setTipoUsuario(TipoUsuario.ASESOR);
-        asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_PAGO);
+        asesor.getUsuario().setEstado(EstadoUsuario.ACTIVO);
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoAsesor);
     }
