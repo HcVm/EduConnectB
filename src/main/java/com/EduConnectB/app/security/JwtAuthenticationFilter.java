@@ -31,11 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private final AuthenticationManager authenticationManager; // Inyectar el AuthenticationManager directamente
-
+    private final AuthenticationManager authenticationManager;
+    
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
                                    UsuarioRepository usuarioRepository,
-                                   JwtConfig jwtConfig) { // Constructor con los parámetros necesarios
+                                   JwtConfig jwtConfig) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.jwtConfig = jwtConfig;
@@ -67,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.debug("Extracted username from token: {}", username);
         } catch (JWTVerificationException e) {
             log.error("Error verifying JWT token: {}", e.getMessage());
-            // Maneja el error adecuadamente (por ejemplo, devuelve una respuesta de error)
         }
 
         if (username != null) {

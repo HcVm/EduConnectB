@@ -45,7 +45,6 @@ public class JwtService {
             DecodedJWT decodedJWT = verifier.verify(token);
             return decodedJWT.getSubject();
         } catch (JWTVerificationException exception) {
-            // El token no es válido
             return null;
         }
     }

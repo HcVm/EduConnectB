@@ -3,8 +3,10 @@ package com.EduConnectB.app.dto;
 import com.EduConnectB.app.models.TipoMembresia;
 
 public class CompraMembresiaRequest {
+	
 	private Integer usuarioId;
     private TipoMembresia tipoMembresia;
+    
 	public Integer getUsuarioId() {
 		return usuarioId;
 	}
