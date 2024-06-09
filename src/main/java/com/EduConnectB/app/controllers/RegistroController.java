@@ -9,6 +9,7 @@ import com.EduConnectB.app.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class RegistroController {
 
     @Autowired
     private AsesorService asesorService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     private static final int MIN_PASSWORD_LENGTH = 8;
@@ -46,7 +50,7 @@ public class RegistroController {
         if (usuarioService.existsByCorreoElectronico(usuario.getCorreoElectronico())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo electrónico ya está registrado.");
         }
-
+        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         usuario.setTipoUsuario(TipoUsuario.ESTUDIANTE);
         usuario.setEstado(EstadoUsuario.PENDIENTE_PAGO);
         Usuario nuevoUsuario = usuarioService.guardarUsuario(usuario);
@@ -70,7 +74,7 @@ public class RegistroController {
         if (usuarioService.existsByCorreoElectronico(asesor.getUsuario().getCorreoElectronico())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo electrónico ya está registrado.");
         }
-
+        asesor.getUsuario().setContrasena(passwordEncoder.encode(asesor.getUsuario().getContrasena()));
         asesor.getUsuario().setTipoUsuario(TipoUsuario.ASESOR);
         asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_PAGO);
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
