@@ -1,7 +1,7 @@
 # EduConnectB
 
 
-Sigue este gist para encontrar el dump de la BD.
+Sigue este gist para encontrar el dump de la BD (SE HA ACTUALIZADO LA BASE DE DATOS Y ALGUNOS CAMPOS)
 
 https://gist.github.com/HcVm/28c46ca6f7815ccfb41556405705c3d4
 
