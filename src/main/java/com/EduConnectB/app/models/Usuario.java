@@ -26,6 +26,8 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Asesor> asesores;
+    
+    private String tokenTemporal;
 
 	public Integer getIdUsuario() {
 		return idUsuario;
@@ -91,8 +93,16 @@ public class Usuario {
 		this.asesores = asesores;
 	}
 
+	public String getTokenTemporal() {
+		return tokenTemporal;
+	}
+
+	public void setTokenTemporal(String tokenTemporal) {
+		this.tokenTemporal = tokenTemporal;
+	}
+
 	public Usuario(String nombre, String correoElectronico, String contrasena, TipoUsuario tipoUsuario,
-			LocalDateTime fechaRegistro, EstadoUsuario estado, List<Asesor> asesores) {
+			LocalDateTime fechaRegistro, EstadoUsuario estado, List<Asesor> asesores, String tokenTemporal) {
 		this.nombre = nombre;
 		this.correoElectronico = correoElectronico;
 		this.contrasena = contrasena;
@@ -100,11 +110,11 @@ public class Usuario {
 		this.fechaRegistro = fechaRegistro;
 		this.estado = estado;
 		this.asesores = asesores;
+		this.tokenTemporal = tokenTemporal;
 	}
 
 	public Usuario() {
 
 	}
-
 	
 }

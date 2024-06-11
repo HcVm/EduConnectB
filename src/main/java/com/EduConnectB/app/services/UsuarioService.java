@@ -52,4 +52,8 @@ public class UsuarioService {
     public boolean existsByCorreoElectronico(String correoElectronico) {
         return usuarioRepository.existsByCorreoElectronico(correoElectronico);
     }
+    
+    public Optional<Usuario> findByTokenTemporal(String tokenTemporal) {
+        return usuarioRepository.findByTokenTemporal(tokenTemporal);
+    }
 }

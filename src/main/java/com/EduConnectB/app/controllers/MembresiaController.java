@@ -4,9 +4,8 @@ import com.EduConnectB.app.dto.CompraMembresiaRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Membresia;
-import com.EduConnectB.app.models.TipoMembresia;
-import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
+import com.EduConnectB.app.security.JwtService;
 import com.EduConnectB.app.services.MembresiaService;
 import com.EduConnectB.app.services.UsuarioService;
 
@@ -14,12 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/membresias")
@@ -31,46 +35,53 @@ public class MembresiaController extends BaseController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
 
     // Comprar membresía (simulación de pago ya que no tenemos integrada una pasarela)
     @PostMapping("/comprar")
-    public ResponseEntity<Membresia> comprarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> comprarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new Membresia()); 
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        Usuario usuario = usuarioService.obtenerUsuarioPorId(request.getUsuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        if (membresiaService.tieneMembresiaActiva(usuario)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya tienes una membresía activa.");
-        }
+        Usuario usuario = usuarioService.findByTokenTemporal(request.getTokenTemporal())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado o token temporal inválido"));
 
-        boolean pagoExitoso = true; 
+        boolean pagoExitoso = true; // Simula un pago exitoso
 
         if (pagoExitoso) {
             Membresia nuevaMembresia = new Membresia();
             nuevaMembresia.setUsuario(usuario);
             nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
             nuevaMembresia.setFechaInicio(LocalDate.now());
-            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); // Ejemplo: 1 mes de membresía
-            
-            nuevaMembresia = membresiaService.guardarMembresia(nuevaMembresia);
-            if (nuevaMembresia.getTipoMembresia() == TipoMembresia.ASESOR) {
-                usuario.setTipoUsuario(TipoUsuario.ASESOR);
-            } else if (nuevaMembresia.getTipoMembresia() == TipoMembresia.ESTUDIANTE_PRO) {
-                usuario.setTipoUsuario(TipoUsuario.ESTUDIANTE);
-            } else if (nuevaMembresia.getTipoMembresia() == TipoMembresia.ESTUDIANTE_ESTANDAR){
-                usuario.setTipoUsuario(TipoUsuario.ESTUDIANTE);
-            }
-            
+            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); //1 mes de membresía
+            membresiaService.guardarMembresia(nuevaMembresia);
+
+            usuario.setTipoUsuario(request.getTipoMembresia().getTipoUsuarioAsociado());
             usuario.setEstado(EstadoUsuario.ACTIVO);
+            usuario.setTokenTemporal(null); // Eliminar el token temporal
             usuarioService.guardarUsuario(usuario);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevaMembresia);
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(usuario.getCorreoElectronico(), usuario.getContrasena())
+            );
+            String token = jwtService.generarToken(authentication);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("membresia", nuevaMembresia);
+            response.put("token", token);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en el pago.");
         }
     }
+    
 
     @GetMapping("/estado")
     public ResponseEntity<Boolean> tieneMembresiaActiva() {

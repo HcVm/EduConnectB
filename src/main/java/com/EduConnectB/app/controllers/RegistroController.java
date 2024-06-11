@@ -7,6 +7,7 @@ import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -29,6 +33,7 @@ public class RegistroController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     private static final int MIN_PASSWORD_LENGTH = 8;
@@ -52,9 +57,20 @@ public class RegistroController {
         }
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         usuario.setTipoUsuario(TipoUsuario.ESTUDIANTE);
-        usuario.setEstado(EstadoUsuario.ACTIVO);
+        usuario.setEstado(EstadoUsuario.PENDIENTE_PAGO);
+        
+        String tokenTemporal = UUID.randomUUID().toString();
+        usuario.setTokenTemporal(tokenTemporal);
+
         Usuario nuevoUsuario = usuarioService.guardarUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("usuario", nuevoUsuario);
+        response.put("tokenTemporal", tokenTemporal);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/comprarMembresia");
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
     @PostMapping("/asesor")
@@ -76,8 +92,20 @@ public class RegistroController {
         }
         asesor.getUsuario().setContrasena(passwordEncoder.encode(asesor.getUsuario().getContrasena()));
         asesor.getUsuario().setTipoUsuario(TipoUsuario.ASESOR);
-        asesor.getUsuario().setEstado(EstadoUsuario.ACTIVO);
+        asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_PAGO);
+
+        
+        String tokenTemporal = UUID.randomUUID().toString();
+        asesor.getUsuario().setTokenTemporal(tokenTemporal);
+
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoAsesor);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("usuario", nuevoAsesor);
+        response.put("tokenTemporal", tokenTemporal);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/comprarMembresia");
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 }
