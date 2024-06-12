@@ -7,8 +7,8 @@ import com.EduConnectB.app.config.EduConnectUserDetails;
 import com.EduConnectB.app.config.JwtConfig;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.dao.UsuarioRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private final AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
     
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
                                    UsuarioRepository usuarioRepository,
@@ -41,45 +41,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtConfig = jwtConfig;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
         String header = request.getHeader("Authorization");
+        String path = request.getServletPath();
 
         log.debug("Request URI: {}", request.getRequestURI());
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            log.debug("No token provided or invalid header format");
-            chain.doFilter(request, response);
-            return;
-        }
+        if (header != null && header.startsWith("Bearer ") && !path.equals("/membresias/comprar")) {
+            String token = header.replace("Bearer ", "");
+            String username = null;
 
-        String token = header.replace("Bearer ", "");
-        String username = null;
+            try {
+                username = JWT.require(Algorithm.HMAC512(jwtConfig.getSecretKey().getBytes()))
+                        .build()
+                        .verify(token)
+                        .getSubject();
+                log.debug("Usuario extraído del Token: {}", username);
+            } catch (JWTVerificationException e) {
+                log.error("Error verificando el token JWT : {}", e.getMessage());
+            }
 
-        try {
-            username = JWT.require(Algorithm.HMAC512(jwtConfig.getSecretKey().getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-            log.debug("Extracted username from token: {}", username);
-        } catch (JWTVerificationException e) {
-            log.error("Error verifying JWT token: {}", e.getMessage());
-        }
+            if (username != null) {
+                Usuario usuario = usuarioRepository.findByCorreoElectronico(username);
+                if (usuario != null) {
+                    EduConnectUserDetails userDetails = new EduConnectUserDetails(usuario);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
 
-        if (username != null) {
-            Usuario usuario = usuarioRepository.findByCorreoElectronico(username);
-            if (usuario != null) {
-                EduConnectUserDetails userDetails = new EduConnectUserDetails(usuario);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("User authenticated: {}", username);
-            } else {
-                log.warn("User not found in database: {}", username);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("Usuario Autenticado: {}", username);
+                } else {
+                    log.warn("El usuario no existe en la base de datos: {}", username);
+                }
             }
         }
 

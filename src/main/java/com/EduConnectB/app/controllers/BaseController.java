@@ -1,21 +1,20 @@
 package com.EduConnectB.app.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.EduConnectB.app.config.EduConnectUserDetails;
-import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 
 @RestController
+@RequestMapping("/usuarios")
 public abstract class BaseController {
 
 	@ModelAttribute("usuarioAutenticado")
@@ -27,13 +26,15 @@ public abstract class BaseController {
                 return ((EduConnectUserDetails) principal).getUsuario();
             }
         }
-        throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
+        return null;
     }
-	
-	@GetMapping("/current")
-    @PreAuthorize("isAuthenticated()")
+
+    @GetMapping("/current")
     public ResponseEntity<Usuario> obtenerUsuarioActual() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(usuarioAutenticado);
     }
     

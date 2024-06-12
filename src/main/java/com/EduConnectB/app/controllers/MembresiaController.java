@@ -10,24 +10,20 @@ import com.EduConnectB.app.services.MembresiaService;
 import com.EduConnectB.app.services.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/membresias")
-@PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
 public class MembresiaController extends BaseController {
 
     @Autowired
@@ -52,37 +48,30 @@ public class MembresiaController extends BaseController {
         Usuario usuario = usuarioService.findByTokenTemporal(request.getTokenTemporal())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado o token temporal inválido"));
 
-        boolean pagoExitoso = true; // Simula un pago exitoso
+        boolean pagoExitoso = true; 
+
 
         if (pagoExitoso) {
             Membresia nuevaMembresia = new Membresia();
             nuevaMembresia.setUsuario(usuario);
             nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
             nuevaMembresia.setFechaInicio(LocalDate.now());
-            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); //1 mes de membresía
+            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); 
             membresiaService.guardarMembresia(nuevaMembresia);
 
             usuario.setTipoUsuario(request.getTipoMembresia().getTipoUsuarioAsociado());
             usuario.setEstado(EstadoUsuario.ACTIVO);
-            usuario.setTokenTemporal(null); // Eliminar el token temporal
+            usuario.setTokenTemporal(null);
             usuarioService.guardarUsuario(usuario);
 
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(usuario.getCorreoElectronico(), usuario.getContrasena())
-            );
-            String token = jwtService.generarToken(authentication);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("membresia", nuevaMembresia);
-            response.put("token", token);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", "/login"); 
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en el pago.");
         }
     }
     
-
     @GetMapping("/estado")
     public ResponseEntity<Boolean> tieneMembresiaActiva() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -93,6 +82,7 @@ public class MembresiaController extends BaseController {
             throw new AuthenticationRequiredException("No estás autenticado.");
         }
     }
+    
 
     @GetMapping("/mi-membresia")
     public ResponseEntity<Membresia> obtenerMiMembresia() {
@@ -127,6 +117,7 @@ public class MembresiaController extends BaseController {
     //}
 
     // Renovar la membresía del usuario (simulación de pago)
+
     @PostMapping("/renovar/prueba")
     public ResponseEntity<Membresia> renovarMembresiaPrueba() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -142,6 +133,7 @@ public class MembresiaController extends BaseController {
         }
     }
     
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
     @DeleteMapping("/cancelar")
     public ResponseEntity<Void> cancelarMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();

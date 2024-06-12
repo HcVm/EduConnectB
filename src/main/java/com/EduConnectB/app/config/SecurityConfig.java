@@ -2,6 +2,7 @@ package com.EduConnectB.app.config;
 
 import com.EduConnectB.app.security.JwtAuthenticationFilter;
 import com.EduConnectB.app.security.JwtService;
+import com.EduConnectB.app.security.TemporalTokenAuthenticationFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,9 +32,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-	@Lazy
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
 	
     private final UsuarioRepository usuarioRepository;
     private final JwtConfig jwtConfig;
@@ -40,6 +39,9 @@ public class SecurityConfig {
     
     @Autowired
     private JwtService jwtService;
+    
+    @Autowired
+    private TemporalTokenAuthenticationFilter temporalTokenAuthenticationFilter;
     
     @Autowired
     public SecurityConfig(UsuarioRepository usuarioRepository, JwtConfig jwtConfig, CorsConfigurationSource corsConfigurationSource) {
@@ -62,11 +64,12 @@ public class SecurityConfig {
                 .requestMatchers("/estudiantes/**").hasAnyAuthority("ESTUDIANTE_ESTANDAR", "ESTUDIANTE_PRO")
                 .requestMatchers("/asesores/**").hasAuthority("ASESOR")
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/error","/registro/**", "/login", "/usuarios/current").permitAll()
+                .requestMatchers("/error","/registro/**", "/login", "/membresias/comprar", "usuarios/current").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterAfter(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);
+            .addFilterAfter(temporalTokenAuthenticationFilter, AnonymousAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
