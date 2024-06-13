@@ -1,6 +1,7 @@
 package com.EduConnectB.app.controllers;
 
 import com.EduConnectB.app.models.Asesor;
+import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.UsuarioService;
@@ -77,6 +78,13 @@ public class AdminController extends BaseController {
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoAsesor);
     }
+    
+    @GetMapping("/asesores/pendientes") 
+    public ResponseEntity<List<Asesor>> obtenerAsesoresPendientesDeAprobacion() {
+        List<Asesor> asesoresPendientes = asesorService.obtenerAsesoresPorEstado(EstadoUsuario.PENDIENTE_APROBACION);
+        return ResponseEntity.ok(asesoresPendientes);
+    }
+
 
     @PutMapping("/asesores/{idAsesor}")
     public ResponseEntity<Asesor> actualizarAsesor(@PathVariable Integer idAsesor, @RequestBody Asesor asesor) {
@@ -87,6 +95,32 @@ public class AdminController extends BaseController {
     @DeleteMapping("/asesores/{idAsesor}")
     public ResponseEntity<Void> eliminarAsesor(@PathVariable Integer idAsesor) {
         asesorService.eliminarAsesor(idAsesor);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PutMapping("/asesores/{idAsesor}/aprobar")
+    public ResponseEntity<Asesor> aprobarAsesor(@PathVariable Integer idAsesor) {
+        Asesor asesor = asesorService.obtenerAsesorPorId(idAsesor)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado"));
+
+        if (asesor.getUsuario().getEstado() != EstadoUsuario.PENDIENTE_APROBACION) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El asesor no está pendiente de aprobación.");
+        }
+
+        asesorService.aprobarAsesor(asesor);
+        return ResponseEntity.ok(asesor);
+    }
+
+    @PutMapping("/asesores/{idAsesor}/rechazar")
+    public ResponseEntity<Void> rechazarAsesor(@PathVariable Integer idAsesor) {
+        Asesor asesor = asesorService.obtenerAsesorPorId(idAsesor)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado"));
+
+        if (asesor.getUsuario().getEstado() != EstadoUsuario.PENDIENTE_APROBACION) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El asesor no está pendiente de aprobación.");
+        }
+
+        asesorService.rechazarAsesor(asesor);
         return ResponseEntity.noContent().build();
     }
 }

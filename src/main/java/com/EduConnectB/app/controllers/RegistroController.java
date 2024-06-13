@@ -5,6 +5,7 @@ import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
+import com.EduConnectB.app.services.NotificacionService;
 import com.EduConnectB.app.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,9 @@ public class RegistroController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private NotificacionService notificationService;
     
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
@@ -94,18 +98,13 @@ public class RegistroController {
         asesor.getUsuario().setTipoUsuario(TipoUsuario.ASESOR);
         asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_APROBACION);
 
-        
-        String tokenTemporal = UUID.randomUUID().toString();
-        asesor.getUsuario().setTokenTemporal(tokenTemporal);
 
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
+        notificationService.enviarNotificacionNuevoAsesor(nuevoAsesor);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("usuario", nuevoAsesor);
-        response.put("tokenTemporal", tokenTemporal);
+        response.put("mensaje", "Solicitud de registro enviada. Esperando aprobación del administrador.");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/comprarMembresia");
-        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
