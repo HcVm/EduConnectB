@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/estudiantes")
-@PreAuthorize("hasAnyAuthority('ESTUDIANTE_ESTANDAR', 'ESTUDIANTE_PRO')")
+@PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
 public class EstudianteController extends BaseController {
 
     @Autowired
