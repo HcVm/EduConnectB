@@ -5,7 +5,6 @@ import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Usuario;
-import com.EduConnectB.app.security.JwtService;
 import com.EduConnectB.app.services.MembresiaService;
 import com.EduConnectB.app.services.UsuarioService;
 
@@ -14,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,13 +30,7 @@ public class MembresiaController extends BaseController {
     @Autowired
     private UsuarioService usuarioService;
     
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtService jwtService;
-
-    // Comprar membresía (simulación de pago ya que no tenemos integrada una pasarela)
+    // Comprar membresía (simulación de pago ya que no tenemos integrada una pasarela real amigos)
     @PostMapping("/comprar")
     public ResponseEntity<?> comprarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

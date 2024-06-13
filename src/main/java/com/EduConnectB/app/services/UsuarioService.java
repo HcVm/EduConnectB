@@ -65,4 +65,8 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
         return token;
     }
+    
+    public Usuario findByTokenRestablecimiento(String token) {
+        return usuarioRepository.findByTokenRestablecimiento(token);
+    }
 }

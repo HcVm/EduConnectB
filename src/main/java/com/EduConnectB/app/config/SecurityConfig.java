@@ -1,7 +1,6 @@
 package com.EduConnectB.app.config;
 
 import com.EduConnectB.app.security.JwtAuthenticationFilter;
-import com.EduConnectB.app.security.JwtService;
 import com.EduConnectB.app.security.TemporalTokenAuthenticationFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,29 +31,24 @@ public class SecurityConfig {
 
 	
     private final UsuarioRepository usuarioRepository;
-    private final JwtConfig jwtConfig;
     private final CorsConfigurationSource corsConfigurationSource;
-    
-    @Autowired
-    private JwtService jwtService;
     
     @Autowired
     private TemporalTokenAuthenticationFilter temporalTokenAuthenticationFilter;
     
-    @Autowired
+
     public SecurityConfig(UsuarioRepository usuarioRepository, JwtConfig jwtConfig, CorsConfigurationSource corsConfigurationSource) {
         this.usuarioRepository = usuarioRepository;
-        this.jwtConfig = jwtConfig;
         this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(csrf -> csrf.disable())
@@ -62,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/estudiantes/**").hasAnyAuthority("ESTUDIANTE")
                 .requestMatchers("/asesores/**").hasAuthority("ASESOR")
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/error","/registro/**", "/login", "/membresias/comprar", "usuarios/current").permitAll()
+                .requestMatchers("/error","/registro/**", "/login", "/membresias/comprar", "usuarios/current", "/restablecer-contrasena").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -73,7 +67,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    UserDetailsService userDetailsService() {
         return username -> {
             Usuario usuario = usuarioRepository.findByCorreoElectronico(username);
             if (usuario == null) {
@@ -84,12 +78,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
