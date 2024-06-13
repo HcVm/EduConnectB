@@ -9,6 +9,7 @@ import com.EduConnectB.app.models.Valoracion;
 import com.EduConnectB.app.services.BibliotecaDigitalService;
 import com.EduConnectB.app.services.CalificacionService;
 import com.EduConnectB.app.services.SesionService;
+import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.services.ValoracionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,9 @@ public class EstudianteController extends BaseController {
 
     @Autowired
     private SesionService sesionService;
+    
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Autowired
     private ValoracionService valoracionService;
@@ -98,6 +102,13 @@ public class EstudianteController extends BaseController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el recurso.", e);
         }
+    }
+    
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Integer idUsuario) {
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(idUsuario)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        return ResponseEntity.ok(usuario);
     }
     
     
