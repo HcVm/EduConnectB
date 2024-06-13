@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -104,11 +106,23 @@ public class EstudianteController extends BaseController {
         }
     }
     
-    @GetMapping("/{idUsuario}")
-    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Integer idUsuario) {
-        Usuario usuario = usuarioService.obtenerUsuarioPorId(idUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        return ResponseEntity.ok(usuario);
+    @GetMapping("/perfil")
+    public ResponseEntity<Usuario> obtenerDatosUsuarioAutenticado() {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado != null) {
+            return ResponseEntity.ok(usuarioAutenticado);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No estás autenticado.");
+        }
+    }
+
+    public Usuario obtenerUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return usuarioService.obtenerUsuarioPorUsername(authentication.getName());
+        } else {
+            return null;
+        }
     }
     
     

@@ -19,4 +19,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByCorreoElectronico(String correoElectronico); 
     
     Optional<Usuario> findByTokenTemporal(String tokenTemporal);
+    
+    Usuario findByUsername(String username);
 }
