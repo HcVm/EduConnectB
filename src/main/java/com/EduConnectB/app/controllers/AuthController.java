@@ -5,6 +5,7 @@ import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.security.JwtService;
 import com.EduConnectB.app.services.EmailService;
 import com.EduConnectB.app.services.UsuarioService;
+import com.EduConnectB.app.dto.NuevaContrasenaRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 public class AuthController {

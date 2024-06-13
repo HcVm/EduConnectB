@@ -3,7 +3,6 @@ package com.EduConnectB.app.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "usuario")
@@ -24,8 +23,8 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private EstadoUsuario estado;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<Asesor> asesores;
+    @OneToOne
+    private Asesor asesor;
     
     private String tokenTemporal;
     
@@ -87,12 +86,12 @@ public class Usuario {
 		this.estado = estado;
 	}
 
-	public List<Asesor> getAsesores() {
-		return asesores;
+	public Asesor getAsesor() {
+		return asesor;
 	}
 
-	public void setAsesores(List<Asesor> asesores) {
-		this.asesores = asesores;
+	public void setAsesor(Asesor asesor) {
+		this.asesor = asesor;
 	}
 
 	public String getTokenTemporal() {
@@ -112,7 +111,7 @@ public class Usuario {
 	}
 
 	public Usuario(String nombre, String correoElectronico, String contrasena, TipoUsuario tipoUsuario,
-			LocalDateTime fechaRegistro, EstadoUsuario estado, List<Asesor> asesores, String tokenTemporal,
+			LocalDateTime fechaRegistro, EstadoUsuario estado, Asesor asesor, String tokenTemporal,
 			String tokenRestablecimiento) {
 		this.nombre = nombre;
 		this.correoElectronico = correoElectronico;
@@ -120,7 +119,7 @@ public class Usuario {
 		this.tipoUsuario = tipoUsuario;
 		this.fechaRegistro = fechaRegistro;
 		this.estado = estado;
-		this.asesores = asesores;
+		this.asesor = asesor;
 		this.tokenTemporal = tokenTemporal;
 		this.tokenRestablecimiento = tokenRestablecimiento;
 	}

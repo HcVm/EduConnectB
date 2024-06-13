@@ -22,7 +22,7 @@ import java.io.IOException;
 @Component
 public class TemporalTokenAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
+	@Autowired
     private UsuarioRepository usuarioRepository;
 
     private static final Logger log = LoggerFactory.getLogger(TemporalTokenAuthenticationFilter.class);
