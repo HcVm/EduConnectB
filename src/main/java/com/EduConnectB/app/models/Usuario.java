@@ -28,6 +28,8 @@ public class Usuario {
     private List<Asesor> asesores;
     
     private String tokenTemporal;
+    
+    private String tokenRestablecimiento;
 
 	public Integer getIdUsuario() {
 		return idUsuario;
@@ -101,8 +103,17 @@ public class Usuario {
 		this.tokenTemporal = tokenTemporal;
 	}
 
+	public String getTokenRestablecimiento() {
+		return tokenRestablecimiento;
+	}
+
+	public void setTokenRestablecimiento(String tokenRestablecimiento) {
+		this.tokenRestablecimiento = tokenRestablecimiento;
+	}
+
 	public Usuario(String nombre, String correoElectronico, String contrasena, TipoUsuario tipoUsuario,
-			LocalDateTime fechaRegistro, EstadoUsuario estado, List<Asesor> asesores, String tokenTemporal) {
+			LocalDateTime fechaRegistro, EstadoUsuario estado, List<Asesor> asesores, String tokenTemporal,
+			String tokenRestablecimiento) {
 		this.nombre = nombre;
 		this.correoElectronico = correoElectronico;
 		this.contrasena = contrasena;
@@ -111,10 +122,12 @@ public class Usuario {
 		this.estado = estado;
 		this.asesores = asesores;
 		this.tokenTemporal = tokenTemporal;
+		this.tokenRestablecimiento = tokenRestablecimiento;
 	}
 
 	public Usuario() {
 
 	}
+
 	
 }

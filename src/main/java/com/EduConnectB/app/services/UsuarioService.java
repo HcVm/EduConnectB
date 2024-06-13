@@ -9,6 +9,7 @@ import com.EduConnectB.app.models.Usuario;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -56,5 +57,12 @@ public class UsuarioService {
     
     public Optional<Usuario> findByTokenTemporal(String tokenTemporal) {
         return usuarioRepository.findByTokenTemporal(tokenTemporal);
+    }
+    
+    public String generarTokenRestablecimiento(Usuario usuario) {
+        String token = UUID.randomUUID().toString();
+        usuario.setTokenRestablecimiento(token);
+        usuarioRepository.save(usuario);
+        return token;
     }
 }
