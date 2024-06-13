@@ -20,9 +20,6 @@ public class AsesorService {
 
     @Autowired
     private AsesorRepository asesorRepository;
-    
-    @Autowired
-    private JavaMailSender mailSender;
 
     public List<Asesor> obtenerTodosLosAsesores() {
         return asesorRepository.findAll();
@@ -66,14 +63,6 @@ public class AsesorService {
         asesor.getUsuario().setEstado(EstadoUsuario.ACTIVO);
         asesorRepository.save(asesor);
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(asesor.getUsuario().getCorreoElectronico());
-        message.setSubject("¡Tu solicitud de asesor en EduConnect ha sido aprobada!");
-        message.setText("Hola " + asesor.getUsuario().getNombre() + ",\n\n" +
-                "Nos complace informarte que tu solicitud para ser asesor en EduConnect ha sido aprobada.\n" +
-                "Ahora puedes iniciar sesión y comenzar a ofrecer tus servicios de asesoría.\n\n" +
-                "¡Bienvenido a la comunidad de EduConnect!");
-        mailSender.send(message);
     }
 
     @Transactional
@@ -81,14 +70,5 @@ public class AsesorService {
         asesor.getUsuario().setEstado(EstadoUsuario.RECHAZADO); 
         asesorRepository.save(asesor);
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(asesor.getUsuario().getCorreoElectronico());
-        message.setSubject("Tu solicitud de asesor en EduConnect ha sido rechazada");
-        message.setText("Hola " + asesor.getUsuario().getNombre() + ",\n\n" +
-                "Lamentamos informarte que tu solicitud para ser asesor en EduConnect ha sido rechazada.\n" +
-                "Si tienes alguna pregunta, puedes ponerte en contacto con nosotros.\n\n" +
-                "Atentamente,\n" +
-                "El equipo de EduConnect");
-        mailSender.send(message);
     }
 }

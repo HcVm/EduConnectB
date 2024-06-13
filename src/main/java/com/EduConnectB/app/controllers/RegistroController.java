@@ -100,11 +100,11 @@ public class RegistroController {
 
 
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
-        notificationService.enviarNotificacionNuevoAsesor(nuevoAsesor);
 
         Map<String, Object> response = new HashMap<>();
         response.put("mensaje", "Solicitud de registro enviada. Esperando aprobación del administrador.");
+        response.put("asesorId", nuevoAsesor.getIdAsesor());
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
