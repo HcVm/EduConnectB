@@ -15,6 +15,10 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    
+    public Usuario obtenerUsuarioPorUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
 
     public List<Usuario> obtenerTodosLosUsuarios() {
         return usuarioRepository.findAll();
