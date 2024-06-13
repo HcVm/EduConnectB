@@ -119,12 +119,10 @@ public class EstudianteController extends BaseController {
     public Usuario obtenerUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-            return usuarioService.obtenerUsuarioPorUsername(authentication.getName());
+            return usuarioService.buscarPorCorreoElectronico(authentication.getName());
         } else {
             return null;
         }
-    }
-    
-    
+    } 
 }
 

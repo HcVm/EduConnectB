@@ -20,5 +20,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     
     Optional<Usuario> findByTokenTemporal(String tokenTemporal);
     
-    Usuario findByUsername(String username);
 }

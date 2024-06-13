@@ -92,7 +92,7 @@ public class RegistroController {
         }
         asesor.getUsuario().setContrasena(passwordEncoder.encode(asesor.getUsuario().getContrasena()));
         asesor.getUsuario().setTipoUsuario(TipoUsuario.ASESOR);
-        asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_PAGO);
+        asesor.getUsuario().setEstado(EstadoUsuario.PENDIENTE_APROBACION);
 
         
         String tokenTemporal = UUID.randomUUID().toString();
