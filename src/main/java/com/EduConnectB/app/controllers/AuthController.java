@@ -3,9 +3,10 @@ package com.EduConnectB.app.controllers;
 import com.EduConnectB.app.dto.LoginRequest;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.security.JwtService;
-import com.EduConnectB.app.services.EmailService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.dto.NuevaContrasenaRequest;
+
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,24 +34,20 @@ public class AuthController {
     private UserDetailsService userDetailsService;
     
     @Autowired
-    private EmailService emailService;
-    
-    @Autowired
     private UsuarioService usuarioService;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/restablecer-contrasena")
-    public ResponseEntity<?> solicitarRestablecimientoContrasena(@RequestParam String correoElectronico) {
+    public ResponseEntity<Map<String, String>> solicitarRestablecimientoContrasena(@RequestParam String correoElectronico) {
         Usuario usuario = usuarioService.buscarPorCorreoElectronico(correoElectronico);
         if (usuario == null) {
-            return ResponseEntity.badRequest().body("Correo electrónico no registrado.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Correo electrónico no registrado."));
         }
-
         String tokenRestablecimiento = usuarioService.generarTokenRestablecimiento(usuario);
-        emailService.enviarCorreoRestablecimientoContrasena(usuario, tokenRestablecimiento);
-        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer tu contraseña.");
+
+        return ResponseEntity.ok(Map.of("tokenRestablecimiento", tokenRestablecimiento));
     }
 
     @PostMapping("/restablecer-contrasena/{token}")
