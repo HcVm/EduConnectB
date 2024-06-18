@@ -10,7 +10,11 @@ public class Pago {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPago;
-
+    
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
+    
     @ManyToOne
     @JoinColumn(name = "id_membresia")
     private Membresia membresia;
@@ -22,6 +26,12 @@ public class Pago {
 	}
 	public void setIdPago(Integer idPago) {
 		this.idPago = idPago;
+	}
+	public Usuario getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 	public Membresia getMembresia() {
 		return membresia;
@@ -41,14 +51,13 @@ public class Pago {
 	public void setFecha(LocalDateTime fecha) {
 		this.fecha = fecha;
 	}
-	public Pago(Membresia membresia, BigDecimal monto, LocalDateTime fecha) {
+	public Pago(Usuario usuario, Membresia membresia, BigDecimal monto, LocalDateTime fecha) {
+		this.usuario = usuario;
 		this.membresia = membresia;
 		this.monto = monto;
 		this.fecha = fecha;
 	}
 	public Pago() {
-
 	}
-    
-    
+       
 }
