@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/membresias")
@@ -131,40 +133,35 @@ public class MembresiaController extends BaseController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar el comprobante.", e);
         }
     }
-
-
-
-    // Renovar la membresía del usuario (renovación real)
-    //@PostMapping("/renovar")
-    //public ResponseEntity<Membresia> renovarMembresia() {
-    //Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-    //if (usuarioAutenticado != null) {
-    //if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
-    //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para renovar.");
-    //}
-
-    //Membresia membresia = membresiaService.renovarMembresia(usuarioAutenticado, false);
-    //return ResponseEntity.ok(membresia);
-    //} else {
-    //throw new AuthenticationRequiredException("No estás autenticado.");
-    //}
-    //}
-
-    // Renovar la membresía del usuario (simulación de pago)
     
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
-    @PostMapping("/renovar/prueba")
-    public ResponseEntity<Membresia> renovarMembresiaPrueba() {
-        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado != null) {
-            if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para renovar.");
-            }
+    @PostMapping("/renovar")
+    public ResponseEntity<?> renovarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
 
-            Membresia membresia = membresiaService.renovarMembresia(usuarioAutenticado, true);
-            return ResponseEntity.ok(membresia);
-        } else {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
             throw new AuthenticationRequiredException("No estás autenticado.");
+        }
+        Membresia membresia = membresiaService.obtenerMembresiaPorUsuario(usuarioAutenticado);
+        if (membresia == null || membresia.getFechaFin().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para renovar.");
+        }
+
+        Pago pago = pagoService.procesarPago(usuarioAutenticado, membresia.getTipoMembresia(), request.getDatosPago());
+
+        if (pago != null) {
+            membresia.setFechaFin(membresia.getFechaFin().plusMonths(1));
+            membresiaService.guardarMembresia(membresia);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("membresia", membresia);
+
+            return ResponseEntity.ok(response); 
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en el pago. Verifica los datos de la tarjeta.");
         }
     }
     

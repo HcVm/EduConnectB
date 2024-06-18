@@ -27,14 +27,12 @@ public class ComprobanteService {
         emisor.setAlignment(Element.ALIGN_CENTER);
         document.add(emisor);
 
-        // Información del cliente (el estudiante alias estudent)
         Usuario usuario = membresia.getUsuario();
         Paragraph cliente = new Paragraph("Cliente: " + usuario.getNombre(), FontFactory.getFont(FontFactory.HELVETICA, 12));
         document.add(cliente);
         Paragraph correo = new Paragraph("Correo electrónico: " + usuario.getCorreoElectronico(), FontFactory.getFont(FontFactory.HELVETICA, 12));
         document.add(correo);
 
-        // Detalles de membresía
         document.add(new Paragraph("Detalles de la membresía:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
         PdfPTable tablaMembresia = new PdfPTable(2);
         tablaMembresia.addCell("Tipo de membresía:");
@@ -45,7 +43,6 @@ public class ComprobanteService {
         tablaMembresia.addCell(membresia.getFechaFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         document.add(tablaMembresia);
 
-        // Detalles del pago
         document.add(new Paragraph("Detalles del pago:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
         PdfPTable tablaPago = new PdfPTable(2);
         tablaPago.addCell("ID de pago:");

@@ -52,10 +52,10 @@ public class MembresiaService {
     
     //acá simulamos un pago de renovación, como en la adquisición de la membresía
     @Transactional
-    public Membresia renovarMembresia(Usuario usuario, boolean esPrueba) {
+    public Membresia renovarMembresia(Usuario usuario) {
         Membresia membresia = membresiaRepository.findByUsuario(usuario);
-        if (membresia != null) {
-            LocalDate nuevaFechaFin = esPrueba ? LocalDate.now().plusMonths(1) : membresia.getFechaFin().plusDays(30);
+        if (membresia != null && membresia.getFechaFin() != null) {
+            LocalDate nuevaFechaFin = membresia.getFechaFin().plusMonths(1); 
             membresia.setFechaFin(nuevaFechaFin);
             return membresiaRepository.save(membresia);
         } else {
@@ -70,7 +70,6 @@ public class MembresiaService {
         if (membresia != null) {
             membresia.setFechaFin(LocalDate.now());
             membresiaRepository.save(membresia);
-
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una membresía activa para cancelar.");
         }
