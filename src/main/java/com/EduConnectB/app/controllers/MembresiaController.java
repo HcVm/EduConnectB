@@ -135,6 +135,30 @@ public class MembresiaController extends BaseController {
     }
     
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
+    @GetMapping("/mi-membresia/datos-comprobante")
+    public ResponseEntity<Map<String, Object>> obtenerDatosComprobante() {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("No estás autenticado.");
+        }
+
+        Membresia membresia = membresiaService.obtenerMembresiaPorUsuario(usuarioAutenticado);
+        if (membresia == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una membresía activa.");
+        }
+
+        Pago ultimoPago = pagoService.obtenerUltimoPago(membresia);
+        if (ultimoPago == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró ningún pago para esta membresía.");
+        }
+
+        Map<String, Object> datosComprobante = new HashMap<>();
+        datosComprobante.put("membresia", membresia);
+        datosComprobante.put("pago", ultimoPago);
+        return ResponseEntity.ok(datosComprobante);
+    }
+    
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
     @PostMapping("/renovar")
     public ResponseEntity<?> renovarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
