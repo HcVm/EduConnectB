@@ -7,6 +7,7 @@ public class CompraMembresiaRequest {
 	private Integer usuarioId;
     private TipoMembresia tipoMembresia;
     private String tokenTemporal;
+    private DatosPago datosPago;
     
 	public Integer getUsuarioId() {
 		return usuarioId;
@@ -29,4 +30,11 @@ public class CompraMembresiaRequest {
         this.tokenTemporal = tokenTemporal;
     }
 	
+    public DatosPago getDatosPago() {
+        return datosPago;
+    }
+
+    public void setDatosPago(DatosPago datosPago) {
+        this.datosPago = datosPago;
+    }
 }

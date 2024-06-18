@@ -56,7 +56,7 @@ public class SesionController extends BaseController {
             sesion.setUsuario(usuarioAutenticado);
         } else if (usuarioAutenticado.getTipoUsuario() == TipoUsuario.ASESOR) {
             Asesor asesor = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado.")); // Ahora funciona correctamente
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
             sesion.setAsesor(asesor);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para crear una sesión.");

@@ -4,13 +4,18 @@ import com.EduConnectB.app.dto.CompraMembresiaRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Membresia;
+import com.EduConnectB.app.models.Pago;
 import com.EduConnectB.app.models.Usuario;
+import com.EduConnectB.app.services.ComprobanteService;
 import com.EduConnectB.app.services.MembresiaService;
+import com.EduConnectB.app.services.PagoService;
 import com.EduConnectB.app.services.UsuarioService;
+import com.itextpdf.text.DocumentException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -30,6 +35,12 @@ public class MembresiaController extends BaseController {
     @Autowired
     private UsuarioService usuarioService;
     
+    @Autowired
+    private PagoService pagoService;
+    
+    @Autowired
+    private ComprobanteService comprobanteService;
+    
     // Comprar membresía (simulación de pago ya que no tenemos integrada una pasarela real amigos)
     @PostMapping("/comprar")
     public ResponseEntity<?> comprarMembresia(@Validated @RequestBody CompraMembresiaRequest request, BindingResult bindingResult) {
@@ -40,10 +51,9 @@ public class MembresiaController extends BaseController {
         Usuario usuario = usuarioService.findByTokenTemporal(request.getTokenTemporal())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado o token temporal inválido"));
 
-        boolean pagoExitoso = true; 
+        Pago pago = pagoService.procesarPago(usuario, request.getTipoMembresia(), request.getDatosPago());
 
-
-        if (pagoExitoso) {
+        if (pago != null) { 
             Membresia nuevaMembresia = new Membresia();
             nuevaMembresia.setUsuario(usuario);
             nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
@@ -60,10 +70,11 @@ public class MembresiaController extends BaseController {
             headers.add("Location", "/login"); 
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en el pago.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en el pago. Verifica los datos de la tarjeta.");
         }
     }
     
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
     @GetMapping("/estado")
     public ResponseEntity<Boolean> tieneMembresiaActiva() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -75,7 +86,7 @@ public class MembresiaController extends BaseController {
         }
     }
     
-
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
     @GetMapping("/mi-membresia")
     public ResponseEntity<Membresia> obtenerMiMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -90,6 +101,37 @@ public class MembresiaController extends BaseController {
             throw new AuthenticationRequiredException("No estás autenticado.");
         }
     }
+    
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
+    @GetMapping("/mi-membresia/comprobante")
+    public ResponseEntity<byte[]> obtenerComprobanteMembresia() {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("No estás autenticado.");
+        }
+
+        Membresia membresia = membresiaService.obtenerMembresiaPorUsuario(usuarioAutenticado);
+        if (membresia == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una membresía activa.");
+        }
+
+        Pago ultimoPago = pagoService.obtenerUltimoPago(membresia);
+
+        if (ultimoPago == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró ningún pago para esta membresía.");
+        }
+
+        try {
+            byte[] pdfBytes = comprobanteService.generarComprobantePDF(membresia, ultimoPago);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "comprobantePago.pdf");
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (DocumentException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar el comprobante.", e);
+        }
+    }
+
 
 
     // Renovar la membresía del usuario (renovación real)
@@ -109,7 +151,8 @@ public class MembresiaController extends BaseController {
     //}
 
     // Renovar la membresía del usuario (simulación de pago)
-
+    
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
     @PostMapping("/renovar/prueba")
     public ResponseEntity<Membresia> renovarMembresiaPrueba() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -125,7 +168,7 @@ public class MembresiaController extends BaseController {
         }
     }
     
-    @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
     @DeleteMapping("/cancelar")
     public ResponseEntity<Void> cancelarMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
