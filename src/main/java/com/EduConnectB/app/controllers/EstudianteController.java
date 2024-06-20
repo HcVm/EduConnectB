@@ -1,6 +1,8 @@
 package com.EduConnectB.app.controllers;
 
 
+import com.EduConnectB.app.dto.ActualizarUsuarioRequest;
+import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Calificacion;
 import com.EduConnectB.app.models.RecursoBiblioteca;
 import com.EduConnectB.app.models.Sesion;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -79,7 +83,6 @@ public class EstudianteController extends BaseController {
     }
     
     @GetMapping("/biblioteca/{idRecurso}")
-    @PreAuthorize("hasAuthority('ESTUDIANTE_PRO')")
     public ResponseEntity<?> obtenerRecursoBiblioteca(@PathVariable String idRecurso) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
 
@@ -104,6 +107,23 @@ public class EstudianteController extends BaseController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el recurso.", e);
         }
+    }
+    
+    @PutMapping("/actualizar")
+    public ResponseEntity<Usuario> actualizarPerfilEstudiante(@Validated @RequestBody ActualizarUsuarioRequest request, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("No estás autenticado como estudiante.");
+        }
+        usuarioAutenticado.setNombre(request.getNombre());
+        usuarioAutenticado.setCorreoElectronico(request.getCorreoElectronico());
+        Usuario usuarioActualizado = usuarioService.guardarUsuario(usuarioAutenticado); 
+
+        return ResponseEntity.ok(usuarioActualizado);
     }
     
     @GetMapping("/perfil")
