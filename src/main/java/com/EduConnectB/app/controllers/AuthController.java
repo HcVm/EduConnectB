@@ -6,6 +6,7 @@ import com.EduConnectB.app.security.JwtService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.dto.NuevaContrasenaRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -64,7 +66,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getCorreoElectronico(), loginRequest.getContrasena())
@@ -73,9 +75,16 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getCorreoElectronico());
             String token = jwtService.generarToken(authentication);
 
-            return ResponseEntity.ok(token);
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("tipoUsuario", userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse(null)); 
+
+            return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Credenciales inválidas"));
         }
     }
 }
