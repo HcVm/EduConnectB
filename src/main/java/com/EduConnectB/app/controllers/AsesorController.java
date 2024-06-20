@@ -1,5 +1,6 @@
 package com.EduConnectB.app.controllers;
 
+import com.EduConnectB.app.dto.ActualizarAsesorRequest;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.TipoUsuario;
@@ -60,6 +61,28 @@ public class AsesorController extends BaseController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No estás autenticado como asesor.");
         }
     }
+    
+    @PutMapping("/actualizar")
+    public ResponseEntity<Asesor> actualizarPerfilAsesor(@Validated @RequestBody ActualizarAsesorRequest request, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null || usuarioAutenticado.getTipoUsuario() != TipoUsuario.ASESOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para actualizar el perfil de asesor.");
+        }
+
+        Asesor asesor = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
+
+        asesor.setEspecialidad(request.getEspecialidad());
+        asesor.setHorarioDisponibilidad(request.getHorarioDisponibilidad());
+        
+        asesorService.guardarAsesor(asesor);
+        return ResponseEntity.ok(asesor);
+    }
+
 
     @GetMapping("/{idAsesor}/sesiones")
     public ResponseEntity<List<Sesion>> obtenerSesiones(@PathVariable Integer idAsesor) {
