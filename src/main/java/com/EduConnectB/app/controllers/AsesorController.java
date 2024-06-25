@@ -146,11 +146,9 @@ public class AsesorController extends BaseController {
         }
     }
 
-    @PostMapping("/estudiantes/{idEstudiante}/informes/{anio}/{mes}")
+    @PostMapping("/estudiantes/{idEstudiante}/informes")
     public ResponseEntity<Informe> ingresarInforme(
             @PathVariable Integer idEstudiante,
-            @PathVariable Integer anio,
-            @PathVariable Integer mes,
             @Validated @RequestBody Informe informe,
             BindingResult bindingResult) {
         
@@ -166,12 +164,7 @@ public class AsesorController extends BaseController {
         Usuario estudiante = usuarioService.obtenerUsuarioPorId(idEstudiante)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado."));
 
-        YearMonth mesAnioInforme = YearMonth.of(anio, mes);
-        if (!sesionService.asesorTuvoSesionesConEstudianteEnPeriodo(usuarioAutenticado.getIdUsuario(), idEstudiante, mesAnioInforme)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes ingresar un informe para este estudiante en este período.");
-        }
         informe.setEstudiante(estudiante);
-        informe.setMesAnio(mesAnioInforme);
         Informe nuevoInforme = informeService.guardarInforme(informe);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoInforme);
     }

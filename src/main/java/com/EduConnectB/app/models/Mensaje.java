@@ -12,11 +12,11 @@ public class Mensaje {
 
     @ManyToOne
     @JoinColumn(name = "id_remitente")
-    private Usuario remitente; // El usuario que envía el mensaje
+    private Usuario remitente;
 
     @ManyToOne
     @JoinColumn(name = "id_destinatario")
-    private Usuario destinatario; // El usuario que recibe el mensaje, recuerden manitos remitente y destinatarios son usuarios ambos.
+    private Usuario destinatario;
 
     private String contenido;
     private LocalDateTime fechaHora;

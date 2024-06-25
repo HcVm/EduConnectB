@@ -31,12 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private AuthenticationManager authenticationManager;
-    
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
                                    UsuarioRepository usuarioRepository,
                                    JwtConfig jwtConfig) {
-        this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.jwtConfig = jwtConfig;
     }

@@ -5,7 +5,6 @@ import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
-import com.EduConnectB.app.services.NotificacionService;
 import com.EduConnectB.app.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -35,10 +34,6 @@ public class RegistroController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
-    @Autowired
-    private NotificacionService notificationService;
-    
-
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     private static final int MIN_PASSWORD_LENGTH = 8;
 

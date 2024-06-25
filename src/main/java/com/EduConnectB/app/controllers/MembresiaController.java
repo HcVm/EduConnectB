@@ -60,7 +60,7 @@ public class MembresiaController extends BaseController {
             nuevaMembresia.setUsuario(usuario);
             nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
             nuevaMembresia.setFechaInicio(LocalDate.now());
-            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); 
+            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1));
             membresiaService.guardarMembresia(nuevaMembresia);
 
             usuario.setTipoUsuario(request.getTipoMembresia().getTipoUsuarioAsociado());
