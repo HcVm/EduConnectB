@@ -13,14 +13,11 @@ public class Informe {
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario estudiante;
-
-    private YearMonth mesAnio;
     private String contenido;
 
 
-    public Informe(Usuario estudiante, YearMonth mesAnio, String contenido) {
+    public Informe(Usuario estudiante, String contenido) {
         this.estudiante = estudiante;
-        this.mesAnio = mesAnio;
         this.contenido = contenido;
     }
 
@@ -38,14 +35,6 @@ public class Informe {
 
     public void setEstudiante(Usuario estudiante) {
         this.estudiante = estudiante;
-    }
-
-    public YearMonth getMesAnio() {
-        return mesAnio;
-    }
-
-    public void setMesAnio(YearMonth mesAnio) {
-        this.mesAnio = mesAnio;
     }
 
     public String getContenido() {

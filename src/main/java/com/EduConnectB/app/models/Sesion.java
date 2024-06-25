@@ -23,11 +23,11 @@ public class Sesion {
 
     private LocalDateTime fechaHora;
     
-    private EstadoSesion estado; // Enum: 'programada', 'cancelada', 'finalizada'
+    private EstadoSesion estado;
     
     private String urlJitsi;
     
-    @Transient //No persistir en la base de datos
+    @Transient
     private List<ObjectError> errores;
 
 	public Integer getIdSesion() {

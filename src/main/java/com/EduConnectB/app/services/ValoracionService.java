@@ -36,6 +36,6 @@ public class ValoracionService {
     }
     
     public List<Valoracion> obtenerValoracionesPorAsesor(Integer idAsesor) {
-        return valoracionRepository.findBySesionAsesorIdAsesor(idAsesor); // Comprobar que la relación Sesion->Asesor en Valoracion esta bien configurada, a veces me webeo
+        return valoracionRepository.findBySesionAsesorIdAsesor(idAsesor);
     }
 }

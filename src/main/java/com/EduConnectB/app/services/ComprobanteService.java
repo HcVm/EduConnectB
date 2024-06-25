@@ -4,13 +4,11 @@ import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Pago;
 import com.EduConnectB.app.models.Usuario;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
 @Service
