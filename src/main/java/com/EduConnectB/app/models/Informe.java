@@ -1,7 +1,6 @@
 package com.EduConnectB.app.models;
 
 import jakarta.persistence.*;
-import java.time.YearMonth;
 
 @Entity
 @Table(name = "informe")

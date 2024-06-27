@@ -23,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -167,5 +166,11 @@ public class AsesorController extends BaseController {
         informe.setEstudiante(estudiante);
         Informe nuevoInforme = informeService.guardarInforme(informe);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoInforme);
+    }
+    
+    @GetMapping("/estudiantes")
+    public ResponseEntity<List<Usuario>> obtenerEstudiantes() {
+        List<Usuario> estudiantes = usuarioService.buscarPorTipoUsuario(TipoUsuario.ESTUDIANTE);
+        return ResponseEntity.ok(estudiantes);
     }
 }
