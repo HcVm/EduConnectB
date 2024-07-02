@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.EduConnectB.app.dao.MembresiaRepository;
+import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Usuario;
 
@@ -20,6 +21,9 @@ public class MembresiaService {
 
     @Autowired
     private MembresiaRepository membresiaRepository;
+    
+    @Autowired
+    private UsuarioService usuarioService;
 
     public List<Membresia> obtenerTodasLasMembresias() {
         return membresiaRepository.findAll();
@@ -70,6 +74,9 @@ public class MembresiaService {
         if (membresia != null) {
             membresia.setFechaFin(LocalDate.now());
             membresiaRepository.save(membresia);
+
+            usuario.setEstado(EstadoUsuario.PENDIENTE_PAGO);
+            usuarioService.guardarUsuario(usuario);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una membresía activa para cancelar.");
         }

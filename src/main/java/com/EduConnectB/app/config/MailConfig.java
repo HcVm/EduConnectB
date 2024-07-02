@@ -13,11 +13,11 @@ public class MailConfig {
     @Bean
     JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.mailgun.org");
+        mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername("postmaster@sandbox76951250470246e581319cb8440885b4.mailgun.org");
-        mailSender.setPassword("ac2a7ca30c4358381a072675712ebb5c-51356527-72008923");
+        mailSender.setUsername("unlimitededuconnect@gmail.com");
+        mailSender.setPassword("qjngtsntfocxybmi");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
