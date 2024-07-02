@@ -5,6 +5,7 @@ import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
+import com.EduConnectB.app.services.EmailService;
 import com.EduConnectB.app.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +35,9 @@ public class RegistroController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
+    @Autowired
+    private EmailService emailService;
+    
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     private static final int MIN_PASSWORD_LENGTH = 8;
 
@@ -62,8 +66,11 @@ public class RegistroController {
         usuario.setTokenTemporal(tokenTemporal);
 
         Usuario nuevoUsuario = usuarioService.guardarUsuario(usuario);
+        emailService.enviarCorreoConfirmacionEstudiante(nuevoUsuario);
 
         Map<String, Object> response = new HashMap<>();
+        response.put("mensaje", "Registro exitoso. Se ha enviado un correo de confirmación.");
+        response.put("usuarioId", nuevoUsuario.getIdUsuario());
         response.put("usuario", nuevoUsuario);
         response.put("tokenTemporal", tokenTemporal);
 
@@ -95,6 +102,7 @@ public class RegistroController {
 
 
         Asesor nuevoAsesor = asesorService.guardarAsesor(asesor);
+        emailService.enviarCorreoConfirmacionAsesor(nuevoAsesor);
 
         Map<String, Object> response = new HashMap<>();
         response.put("mensaje", "Solicitud de registro enviada. Esperando aprobación del administrador.");

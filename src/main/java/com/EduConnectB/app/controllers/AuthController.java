@@ -3,6 +3,7 @@ package com.EduConnectB.app.controllers;
 import com.EduConnectB.app.dto.LoginRequest;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.security.JwtService;
+import com.EduConnectB.app.services.EmailService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.dto.NuevaContrasenaRequest;
 
@@ -40,6 +41,9 @@ public class AuthController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/restablecer-contrasena")
     public ResponseEntity<Map<String, String>> solicitarRestablecimientoContrasena(@RequestParam String correoElectronico) {
@@ -48,6 +52,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Correo electrónico no registrado."));
         }
         String tokenRestablecimiento = usuarioService.generarTokenRestablecimiento(usuario);
+        emailService.enviarCorreoRestablecimientoContrasena(usuario, tokenRestablecimiento);
 
         return ResponseEntity.ok(Map.of("tokenRestablecimiento", tokenRestablecimiento));
     }

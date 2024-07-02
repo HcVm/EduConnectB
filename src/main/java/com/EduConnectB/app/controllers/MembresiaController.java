@@ -193,15 +193,15 @@ public class MembresiaController extends BaseController {
     @DeleteMapping("/cancelar")
     public ResponseEntity<Void> cancelarMembresia() {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado != null) {
-            if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para cancelar.");
-            }
-
-            membresiaService.cancelarMembresia(usuarioAutenticado);
-            return ResponseEntity.noContent().build();
-        } else {
+        if (usuarioAutenticado == null) {
             throw new AuthenticationRequiredException("No estás autenticado.");
         }
+
+        if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para cancelar.");
+        }
+
+        membresiaService.cancelarMembresia(usuarioAutenticado);
+        return ResponseEntity.noContent().build();
     }
 }
