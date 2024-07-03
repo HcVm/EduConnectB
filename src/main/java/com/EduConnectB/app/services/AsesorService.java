@@ -10,7 +10,6 @@ import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.EstadoUsuario;
-import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
