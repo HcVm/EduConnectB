@@ -23,6 +23,7 @@ public class Sesion {
 
     private LocalDateTime fechaHora;
     
+    @Enumerated(EnumType.STRING)
     private EstadoSesion estado;
     
     private String urlJitsi;

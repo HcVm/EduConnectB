@@ -77,9 +77,9 @@ public class SesionController extends BaseController {
     @PutMapping("/{idSesion}/{accion}")
     @PreAuthorize("hasAuthority('ASESOR')")
     public ResponseEntity<Sesion> responderSolicitudSesion(
-            @PathVariable Integer idSesion, 
+            @PathVariable Integer idSesion,
             @PathVariable String accion) {
-        
+
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         if (usuarioAutenticado == null) {
             throw new AuthenticationRequiredException("No estás autenticado.");
@@ -88,7 +88,10 @@ public class SesionController extends BaseController {
         Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
 
-        if (!sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
+        Asesor asesorAutenticado = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
+
+        if (!sesion.getAsesor().equals(asesorAutenticado)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para responder a esta solicitud.");
         }
 
@@ -102,6 +105,7 @@ public class SesionController extends BaseController {
 
         return ResponseEntity.ok(sesion);
     }
+
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
