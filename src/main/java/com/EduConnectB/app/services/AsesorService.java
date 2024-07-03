@@ -1,5 +1,7 @@
 package com.EduConnectB.app.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,9 @@ import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -17,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,6 +33,8 @@ public class AsesorService {
     
     @Autowired
     private SesionRepository sesionRepository;
+    
+    private static final Logger log = LoggerFactory.getLogger(AsesorService.class);
 
     public List<Asesor> obtenerTodosLosAsesores() {
         return asesorRepository.findAll();
@@ -80,22 +88,41 @@ public class AsesorService {
     }
     
     public boolean estaDisponible(Asesor asesor, LocalDateTime fechaHora) {
-        String horarioDisponibilidad = asesor.getHorarioDisponibilidad();
-        DayOfWeek diaSemana = fechaHora.getDayOfWeek();
-        LocalTime hora = fechaHora.toLocalTime();
+        try {
+            String horarioJson = asesor.getHorarioDisponibilidad();
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, List<String>> horario = objectMapper.readValue(horarioJson, new TypeReference<>() {});
 
-        if (!horarioDisponibilidad.contains(diaSemana.toString()) || 
-            !horarioDisponibilidad.contains(hora.getHour() + ":00")) {
+            DayOfWeek diaSemana = fechaHora.getDayOfWeek();
+            LocalTime horaSolicitada = fechaHora.toLocalTime();
+
+            String diaSemanaStr = diaSemana.toString().toLowerCase();
+            if (!horario.containsKey(diaSemanaStr)) {
+                return false;
+            }
+
+            for (String rangoHorario : horario.get(diaSemanaStr)) {
+                String[] horas = rangoHorario.split("-");
+                LocalTime horaInicio = LocalTime.parse(horas[0]);
+                LocalTime horaFin = LocalTime.parse(horas[1]);
+
+                if (!horaSolicitada.isBefore(horaInicio) && !horaSolicitada.isAfter(horaFin)) {
+                    List<Sesion> sesiones = sesionRepository.findByAsesorAndFechaHoraBetweenAndEstadoNotIn(
+                            asesor,
+                            fechaHora.minusMinutes(30), 
+                            fechaHora.plusMinutes(30),
+                            List.of(EstadoSesion.CANCELADA, EstadoSesion.RECHAZADA)
+                    );
+                    if (sesiones.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (JsonProcessingException e) {
+            log.error("Error al procesar el horario de disponibilidad del asesor: {}", e.getMessage());
             return false;
         }
-
-        List<Sesion> sesiones = sesionRepository.findByAsesorAndFechaHoraBetweenAndEstadoNotIn(
-                asesor, 
-                fechaHora.minusMinutes(30),
-                fechaHora.plusMinutes(30),
-                List.of(EstadoSesion.CANCELADA, EstadoSesion.RECHAZADA)
-        );
-
-        return sesiones.isEmpty();
     }
 }

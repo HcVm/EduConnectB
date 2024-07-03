@@ -24,7 +24,6 @@ import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.Sesion;
-import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.MembresiaService;
