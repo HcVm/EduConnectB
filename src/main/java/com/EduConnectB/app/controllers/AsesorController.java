@@ -103,8 +103,10 @@ public class AsesorController extends BaseController {
 
     @PutMapping("/{idAsesor}/horario")
     public ResponseEntity<Asesor> actualizarHorario(@PathVariable Integer idAsesor, @RequestBody String nuevoHorario) {
-        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado != null && usuarioAutenticado.getIdUsuario().equals(idAsesor)) {
+    Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+    if (usuarioAutenticado != null && usuarioAutenticado.getTipoUsuario() == TipoUsuario.ASESOR) {
+        Asesor asesorAutenticado = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado).get();
+        if (asesorAutenticado.getIdAsesor().equals(idAsesor)) {
             Asesor asesor = asesorService.obtenerAsesorPorId(idAsesor)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
             asesor.setHorarioDisponibilidad(nuevoHorario);
@@ -113,7 +115,10 @@ public class AsesorController extends BaseController {
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes actualizar tu propio horario.");
         }
+    } else {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No estás autenticado como asesor.");
     }
+}
 
     @GetMapping("/{idAsesor}/valoraciones")
     public ResponseEntity<List<Valoracion>> obtenerValoraciones(@PathVariable Integer idAsesor) {
