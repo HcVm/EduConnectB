@@ -16,6 +16,8 @@ public class Asesor {
     private Usuario usuario;
 
     private String especialidad;
+    
+    @Column(columnDefinition = "json")
     private String horarioDisponibilidad;
     
 	public Integer getIdAsesor() {

@@ -93,6 +93,13 @@ public class AsesorController extends BaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes ver tus propias sesiones.");
         }
     }
+    
+    @GetMapping("/{idAsesor}/horario")
+    public ResponseEntity<String> obtenerHorarioDisponibilidad(@PathVariable Integer idAsesor) {
+        Asesor asesor = asesorService.obtenerAsesorPorId(idAsesor)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
+        return ResponseEntity.ok(asesor.getHorarioDisponibilidad());
+    }
 
     @PutMapping("/{idAsesor}/horario")
     public ResponseEntity<Asesor> actualizarHorario(@PathVariable Integer idAsesor, @RequestBody String nuevoHorario) {
