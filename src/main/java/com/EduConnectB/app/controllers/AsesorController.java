@@ -132,9 +132,14 @@ public class AsesorController extends BaseController {
     }
     
     @PostMapping("/{idSesion}/calificaciones")
-    public ResponseEntity<Calificacion> ingresarCalificacion(@PathVariable Integer idSesion, @Validated @RequestBody Calificacion calificacion, BindingResult bindingResult) {
+    @PreAuthorize("hasAuthority('ASESOR')")
+    public ResponseEntity<Calificacion> ingresarCalificacion(
+            @PathVariable Integer idSesion, 
+            @Validated @RequestBody Calificacion calificacion, 
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(calificacion); 
+            return ResponseEntity.badRequest().body(calificacion);
         }
 
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -142,19 +147,21 @@ public class AsesorController extends BaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar calificaciones.");
         }
 
-        Optional<Sesion> sesionOptional = sesionService.obtenerSesionPorId(idSesion);
-        if (sesionOptional.isPresent()) {
-            Sesion sesion = sesionOptional.get();
-            if (sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
-                calificacion.setSesion(sesion); 
-                Calificacion nuevaCalificacion = calificacionService.guardarCalificacion(calificacion);
-                return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCalificacion);
-            } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar calificaciones para esta sesión.");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada.");
+        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
+
+        if (!sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar calificaciones para esta sesión.");
         }
+
+        Usuario estudiante = usuarioService.obtenerUsuarioPorId(calificacion.getUsuario().getIdUsuario())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado."));
+
+        calificacion.setSesion(sesion);
+        calificacion.setUsuario(estudiante);
+
+        Calificacion nuevaCalificacion = calificacionService.guardarCalificacion(calificacion);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCalificacion);
     }
 
     @PostMapping("/estudiantes/{idEstudiante}/informes")
