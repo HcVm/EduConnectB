@@ -150,7 +150,7 @@ public class AsesorController extends BaseController {
         Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
 
-        if (!sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
+        if (!sesion.getAsesor().equals(usuarioAutenticado.getAsesor())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar calificaciones para esta sesión.");
         }
 
@@ -161,7 +161,7 @@ public class AsesorController extends BaseController {
         calificacion.setUsuario(estudiante);
 
         Calificacion nuevaCalificacion = calificacionService.guardarCalificacion(calificacion);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCalificacion);
+        return ResponseEntity.ok(nuevaCalificacion);
     }
 
     @PostMapping("/estudiantes/{idEstudiante}/informes")
