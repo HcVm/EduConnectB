@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.EduConnectB.app.dto.SolicitudSesionRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.EstadoSesion;
@@ -26,6 +27,7 @@ import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.services.AsesorService;
+import com.EduConnectB.app.services.MembresiaService;
 import com.EduConnectB.app.services.SesionService;
 
 
@@ -38,32 +40,68 @@ public class SesionController extends BaseController {
 
     @Autowired
     private AsesorService asesorService;
-
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
-    public ResponseEntity<Sesion> crearSesion(@Validated @RequestBody Sesion sesion, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            sesion.setErrores(bindingResult.getAllErrors());
-            return ResponseEntity.badRequest().body(sesion);
-        }
-
+    
+    @Autowired
+    private MembresiaService membresiaService;
+    
+    @PostMapping("/solicitar")
+    @PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
+    public ResponseEntity<Sesion> solicitarSesion(@RequestBody SolicitudSesionRequest request) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         if (usuarioAutenticado == null) {
-            throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
-        }
-        // Asignar el usuario o asesor autenticado a la sesión (según el rol)
-        if (usuarioAutenticado.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
-            sesion.setUsuario(usuarioAutenticado);
-        } else if (usuarioAutenticado.getTipoUsuario() == TipoUsuario.ASESOR) {
-            Asesor asesor = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
-            sesion.setAsesor(asesor);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para crear una sesión.");
+            throw new AuthenticationRequiredException("No estás autenticado.");
         }
 
-        Sesion nuevaSesion = sesionService.guardarSesion(sesion);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
+        if (!membresiaService.tieneMembresiaActiva(usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes una membresía activa para solicitar sesiones.");
+        }
+
+        Asesor asesor = asesorService.obtenerAsesorPorId(request.getIdAsesor())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado."));
+
+        if (!asesorService.estaDisponible(asesor, request.getFechaHora())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El asesor no está disponible en la fecha y hora solicitadas.");
+        }
+
+        Sesion nuevaSesion = new Sesion();
+        nuevaSesion.setUsuario(usuarioAutenticado);
+        nuevaSesion.setAsesor(asesorService.obtenerAsesorPorId(request.getIdAsesor())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Asesor no encontrado.")));
+        nuevaSesion.setFechaHora(request.getFechaHora());
+        nuevaSesion.setEstado(EstadoSesion.SOLICITADA);
+
+        Sesion sesionGuardada = sesionService.guardarSesion(nuevaSesion);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sesionGuardada);
+    }
+
+
+    @PutMapping("/{idSesion}/{accion}")
+    @PreAuthorize("hasAuthority('ASESOR')")
+    public ResponseEntity<Sesion> responderSolicitudSesion(
+            @PathVariable Integer idSesion, 
+            @PathVariable String accion) {
+        
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("No estás autenticado.");
+        }
+
+        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
+
+        if (!sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para responder a esta solicitud.");
+        }
+
+        if (accion.equals("aceptar")) {
+            sesionService.aceptarSolicitudSesion(sesion);
+        } else if (accion.equals("rechazar")) {
+            sesionService.rechazarSolicitudSesion(sesion);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Acción no válida.");
+        }
+
+        return ResponseEntity.ok(sesion);
     }
 
     @GetMapping

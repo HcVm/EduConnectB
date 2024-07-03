@@ -25,6 +25,9 @@ public class SesionService {
     
     @Autowired
     private JitsiService jitsiService;
+    
+    @Autowired
+    private MembresiaService membresiaService;
 
     public List<Sesion> obtenerTodasLasSesiones() {
         return sesionRepository.findAll();
@@ -44,8 +47,24 @@ public class SesionService {
 
     @Transactional
     public Sesion guardarSesion(Sesion sesion) {
-        sesion.setUrlJitsi(jitsiService.generarUrlSala(sesion.getIdSesion())); // Genera la URL de Jitsi
-        return sesionRepository.save(sesion);
+        if (sesion.getUsuario() != null && !membresiaService.tieneMembresiaActiva(sesion.getUsuario())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El estudiante no tiene una membresía válida para programar sesiones.");
+        }
+        return sesionRepository.save(sesion); 
+    }
+    
+
+	@Transactional
+    public void aceptarSolicitudSesion(Sesion sesion) {
+        sesion.setEstado(EstadoSesion.PROGRAMADA);
+        sesion.setUrlJitsi(jitsiService.generarUrlSala(sesion.getIdSesion()));
+        sesionRepository.save(sesion);
+    }
+
+    @Transactional
+    public void rechazarSolicitudSesion(Sesion sesion) {
+        sesion.setEstado(EstadoSesion.RECHAZADA);
+        sesionRepository.save(sesion);
     }
 
     @Transactional
