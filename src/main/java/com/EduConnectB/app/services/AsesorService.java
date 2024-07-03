@@ -88,41 +88,56 @@ public class AsesorService {
     }
     
     public boolean estaDisponible(Asesor asesor, LocalDateTime fechaHora) {
+        String horarioJson = asesor.getHorarioDisponibilidad();
+
         try {
-            String horarioJson = asesor.getHorarioDisponibilidad();
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, List<String>> horario = objectMapper.readValue(horarioJson, new TypeReference<>() {});
 
             DayOfWeek diaSemana = fechaHora.getDayOfWeek();
-            LocalTime horaSolicitada = fechaHora.toLocalTime();
+            String diaSemanaStr = convertirDiaSemanaAIngles(diaSemana);
 
-            String diaSemanaStr = diaSemana.toString().toLowerCase();
             if (!horario.containsKey(diaSemanaStr)) {
                 return false;
             }
 
+            LocalTime horaSolicitada = fechaHora.toLocalTime();
             for (String rangoHorario : horario.get(diaSemanaStr)) {
                 String[] horas = rangoHorario.split("-");
-                LocalTime horaInicio = LocalTime.parse(horas[0]);
-                LocalTime horaFin = LocalTime.parse(horas[1]);
+                if (horas.length == 2) { 
+                    LocalTime horaInicio = LocalTime.parse(horas[0].trim());
+                    LocalTime horaFin = LocalTime.parse(horas[1].trim());
 
-                if (!horaSolicitada.isBefore(horaInicio) && !horaSolicitada.isAfter(horaFin)) {
-                    List<Sesion> sesiones = sesionRepository.findByAsesorAndFechaHoraBetweenAndEstadoNotIn(
-                            asesor,
-                            fechaHora.minusMinutes(30), 
-                            fechaHora.plusMinutes(30),
-                            List.of(EstadoSesion.CANCELADA, EstadoSesion.RECHAZADA)
-                    );
-                    if (sesiones.isEmpty()) {
-                        return true;
+                    if (!horaSolicitada.isBefore(horaInicio) && !horaSolicitada.isAfter(horaFin)) {
+                        LocalDateTime inicioRango = fechaHora.minusMinutes(30);
+                        LocalDateTime finRango = fechaHora.plusMinutes(30);
+                        boolean tieneSesionesEnElRango = sesionRepository.existsByAsesorAndFechaHoraBetweenAndEstadoNotIn(
+                                asesor, inicioRango, finRango, List.of(EstadoSesion.CANCELADA, EstadoSesion.RECHAZADA)
+                        );
+                        if (!tieneSesionesEnElRango) {
+                            return true;
+                        }
                     }
+                } else {
+                    log.warn("Formato de rango de horario inválido: {}", rangoHorario);
                 }
             }
-
-            return false;
         } catch (JsonProcessingException e) {
             log.error("Error al procesar el horario de disponibilidad del asesor: {}", e.getMessage());
-            return false;
         }
+
+        return false;
+    }
+
+    private String convertirDiaSemanaAIngles(DayOfWeek diaSemana) {
+        return switch (diaSemana) {
+            case MONDAY -> "lunes";
+            case TUESDAY -> "martes";
+            case WEDNESDAY -> "miercoles";
+            case THURSDAY -> "jueves";
+            case FRIDAY -> "viernes";
+            case SATURDAY -> "sabado";
+            case SUNDAY -> "domingo";
+        };
     }
 }

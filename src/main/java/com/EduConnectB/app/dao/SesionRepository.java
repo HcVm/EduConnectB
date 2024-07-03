@@ -32,9 +32,14 @@ public interface SesionRepository extends JpaRepository<Sesion, Integer> {
              @Param("finMes") LocalDate finMes);
     
     
-    @Query("SELECT s FROM Sesion s WHERE s.asesor = :asesor AND s.fechaHora BETWEEN :inicio AND :fin AND s.estado NOT IN :estadosExcluidos")
-    List<Sesion> findByAsesorAndFechaHoraBetweenAndEstadoNotIn(@Param("asesor") Asesor asesor,
-                                                              @Param("inicio") LocalDateTime inicio,
-                                                              @Param("fin") LocalDateTime fin,
-                                                              @Param("estadosExcluidos") List<EstadoSesion> estadosExcluidos);
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END " +
+            "FROM Sesion s " +
+            "WHERE s.asesor = :asesor " +
+            "AND s.fechaHora BETWEEN :inicio AND :fin " +
+            "AND s.estado NOT IN :estadosExcluidos")
+     boolean existsByAsesorAndFechaHoraBetweenAndEstadoNotIn(
+             @Param("asesor") Asesor asesor, 
+             @Param("inicio") LocalDateTime inicio, 
+             @Param("fin") LocalDateTime fin,
+             @Param("estadosExcluidos") List<EstadoSesion> estadosExcluidos);
 }
