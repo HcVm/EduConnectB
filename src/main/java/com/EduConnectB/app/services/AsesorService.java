@@ -4,12 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.EduConnectB.app.dao.AsesorRepository;
+import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.Asesor;
+import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.EstadoUsuario;
+import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
 
 import jakarta.transaction.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +24,9 @@ public class AsesorService {
 
     @Autowired
     private AsesorRepository asesorRepository;
+    
+    @Autowired
+    private SesionRepository sesionRepository;
 
     public List<Asesor> obtenerTodosLosAsesores() {
         return asesorRepository.findAll();
@@ -68,5 +77,25 @@ public class AsesorService {
         asesor.getUsuario().setEstado(EstadoUsuario.RECHAZADO); 
         asesorRepository.save(asesor);
 
+    }
+    
+    public boolean estaDisponible(Asesor asesor, LocalDateTime fechaHora) {
+        String horarioDisponibilidad = asesor.getHorarioDisponibilidad();
+        DayOfWeek diaSemana = fechaHora.getDayOfWeek();
+        LocalTime hora = fechaHora.toLocalTime();
+
+        if (!horarioDisponibilidad.contains(diaSemana.toString()) || 
+            !horarioDisponibilidad.contains(hora.getHour() + ":00")) {
+            return false;
+        }
+
+        List<Sesion> sesiones = sesionRepository.findByAsesorAndFechaHoraBetweenAndEstadoNotIn(
+                asesor, 
+                fechaHora.minusMinutes(30),
+                fechaHora.plusMinutes(30),
+                List.of(EstadoSesion.CANCELADA, EstadoSesion.RECHAZADA)
+        );
+
+        return sesiones.isEmpty();
     }
 }
