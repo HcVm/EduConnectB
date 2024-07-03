@@ -3,11 +3,13 @@ package com.EduConnectB.app.controllers;
 
 import com.EduConnectB.app.dto.ActualizarUsuarioRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
+import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Calificacion;
 import com.EduConnectB.app.models.RecursoBiblioteca;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.models.Valoracion;
+import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.BibliotecaDigitalService;
 import com.EduConnectB.app.services.CalificacionService;
 import com.EduConnectB.app.services.SesionService;
@@ -39,6 +41,9 @@ public class EstudianteController extends BaseController {
     
     @Autowired
     private UsuarioService usuarioService;
+    
+    @Autowired
+    private AsesorService asesorService;
 
     @Autowired
     private ValoracionService valoracionService;
@@ -56,12 +61,11 @@ public class EstudianteController extends BaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes ver tus propias calificaciones.");
         }
     }
-
-    @PostMapping("/sesiones")
-    public ResponseEntity<Sesion> programarSesion(@RequestBody Sesion sesion) {
-        sesion.setUsuario(obtenerUsuarioAutenticado()); 
-        Sesion nuevaSesion = sesionService.guardarSesion(sesion);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
+    
+    @GetMapping("/asesores")
+    public ResponseEntity<List<Asesor>> obtenerTodosLosAsesores() {
+        List<Asesor> asesores = asesorService.obtenerTodosLosAsesores();
+        return ResponseEntity.ok(asesores);
     }
 
     @GetMapping("/{idEstudiante}/sesiones")
