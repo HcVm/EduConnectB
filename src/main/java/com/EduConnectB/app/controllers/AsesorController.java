@@ -85,8 +85,12 @@ public class AsesorController extends BaseController {
 
     @GetMapping("/{idAsesor}/sesiones")
     public ResponseEntity<List<Sesion>> obtenerSesiones(@PathVariable Integer idAsesor) {
-        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado != null && usuarioAutenticado.getIdUsuario().equals(idAsesor)) {
+    	Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null || usuarioAutenticado.getTipoUsuario() != TipoUsuario.ASESOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para actualizar el perfil de asesor.");
+        }
+        Asesor asesorAutenticado = asesorService.obtenerAsesorPorUsuario(usuarioAutenticado).get();
+        if (asesorAutenticado.getIdAsesor().equals(idAsesor)) {
             List<Sesion> sesiones = sesionService.obtenerSesionesPorAsesor(idAsesor);
             return ResponseEntity.ok(sesiones);
         } else {
