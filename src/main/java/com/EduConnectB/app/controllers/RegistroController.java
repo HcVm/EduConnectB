@@ -1,12 +1,10 @@
 package com.EduConnectB.app.controllers;
 
-import com.EduConnectB.app.models.Asesor;
-import com.EduConnectB.app.models.EstadoUsuario;
-import com.EduConnectB.app.models.TipoUsuario;
-import com.EduConnectB.app.models.Usuario;
-import com.EduConnectB.app.services.AsesorService;
-import com.EduConnectB.app.services.EmailService;
-import com.EduConnectB.app.services.UsuarioService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,13 +12,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import com.EduConnectB.app.models.Asesor;
+import com.EduConnectB.app.models.EstadoUsuario;
+import com.EduConnectB.app.models.TipoUsuario;
+import com.EduConnectB.app.models.Usuario;
+import com.EduConnectB.app.services.AsesorService;
+import com.EduConnectB.app.services.EmailService;
+import com.EduConnectB.app.services.UsuarioService;
 
 @RestController
 @RequestMapping("/registro")

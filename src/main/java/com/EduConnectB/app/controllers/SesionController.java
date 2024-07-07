@@ -159,6 +159,13 @@ public class SesionController extends BaseController {
         if (usuarioAutenticado == null) {
             throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
         }
+        
+        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+
+        if (!tienePermisoParaSesion(sesion, usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
+        }
 
         sesionService.cancelarSesion(idSesion, usuarioAutenticado);
         return ResponseEntity.noContent().build();

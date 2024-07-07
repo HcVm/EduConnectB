@@ -53,16 +53,16 @@ public class MembresiaController extends BaseController {
         Usuario usuario = usuarioService.findByTokenTemporal(request.getTokenTemporal())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado o token temporal inválido"));
 
-        Pago pago = pagoService.procesarPago(usuario, request.getTipoMembresia(), request.getDatosPago());
+        Membresia nuevaMembresia = new Membresia();
+        nuevaMembresia.setUsuario(usuario);
+        nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
+        nuevaMembresia.setFechaInicio(LocalDate.now());
+        nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1)); 
+        nuevaMembresia = membresiaService.guardarMembresia(nuevaMembresia);
+
+        Pago pago = pagoService.procesarPago(usuario, nuevaMembresia, request.getDatosPago());
 
         if (pago != null) { 
-            Membresia nuevaMembresia = new Membresia();
-            nuevaMembresia.setUsuario(usuario);
-            nuevaMembresia.setTipoMembresia(request.getTipoMembresia());
-            nuevaMembresia.setFechaInicio(LocalDate.now());
-            nuevaMembresia.setFechaFin(LocalDate.now().plusMonths(1));
-            membresiaService.guardarMembresia(nuevaMembresia);
-
             usuario.setTipoUsuario(request.getTipoMembresia().getTipoUsuarioAsociado());
             usuario.setEstado(EstadoUsuario.ACTIVO);
             usuario.setTokenTemporal(null);
@@ -174,7 +174,7 @@ public class MembresiaController extends BaseController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tienes una membresía activa para renovar.");
         }
 
-        Pago pago = pagoService.procesarPago(usuarioAutenticado, membresia.getTipoMembresia(), request.getDatosPago());
+        Pago pago = pagoService.procesarPago(usuarioAutenticado, membresia, request.getDatosPago());
 
         if (pago != null) {
             membresia.setFechaFin(membresia.getFechaFin().plusMonths(1));

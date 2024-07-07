@@ -21,6 +21,7 @@ public class Pago {
 
     private BigDecimal monto;
     private LocalDateTime fecha;
+    
 	public Integer getIdPago() {
 		return idPago;
 	}

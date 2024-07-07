@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/asesores")
@@ -154,7 +153,7 @@ public class AsesorController extends BaseController {
         Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
 
-        if (!sesion.getAsesor().equals(usuarioAutenticado.getAsesor())) {
+        if (!sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar calificaciones para esta sesión.");
         }
 

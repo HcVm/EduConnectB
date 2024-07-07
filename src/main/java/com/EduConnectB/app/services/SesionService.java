@@ -73,7 +73,7 @@ public class SesionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
 
         if (sesion.getUsuario().equals(usuarioAutenticado) || 
-            sesion.getAsesor().getUsuario().equals(usuarioAutenticado)) {
+            sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
         } else {
