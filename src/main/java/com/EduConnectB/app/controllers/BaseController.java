@@ -41,6 +41,6 @@ public abstract class BaseController {
     protected boolean tienePermisoParaSesion(Sesion sesion, Usuario usuarioAutenticado) {
         return sesion.getUsuario().equals(usuarioAutenticado) || 
                sesion.getAsesor().getUsuario().equals(usuarioAutenticado) ||
-               usuarioAutenticado.getTipoUsuario() == TipoUsuario.ADMIN;
+               usuarioAutenticado.getTipoUsuario() == TipoUsuario.ASESOR;
     }
 }

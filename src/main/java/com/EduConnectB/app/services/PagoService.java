@@ -43,14 +43,15 @@ public class PagoService {
         return pagoRepository.findFirstByMembresiaOrderByFechaDesc(membresia);
     }
     
-    public Pago procesarPago(Usuario usuario, TipoMembresia tipoMembresia, DatosPago datosPago) {
+    public Pago procesarPago(Usuario usuario, Membresia membresia, DatosPago datosPago) {
         if (!validarDatosTarjeta(datosPago)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos de tarjeta inválidos.");
         }
-
+    
         Pago pago = new Pago();
         pago.setUsuario(usuario);
-        pago.setMonto(calcularMontoMembresia(tipoMembresia));
+        pago.setMembresia(membresia);
+        pago.setMonto(calcularMontoMembresia(membresia.getTipoMembresia())); 
         pago.setFecha(LocalDateTime.now());
         return pagoRepository.save(pago);
     }
@@ -70,4 +71,5 @@ public class PagoService {
                 throw new IllegalArgumentException("Tipo de membresía no válido");
         }
     }
+
 }
