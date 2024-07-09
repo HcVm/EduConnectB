@@ -25,7 +25,7 @@ public class SesionService {
     private SesionRepository sesionRepository;
     
     @Autowired
-    private NotificacionController notificacionController;
+    private NotificacionService notificacionService;
     
     @Autowired
     private JitsiService jitsiService;
@@ -81,14 +81,12 @@ public class SesionService {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
             
-            Usuario otroParticipante = (sesion.getUsuario().equals(usuarioAutenticado)) ? sesion.getAsesor().getUsuario() : sesion.getUsuario();
-            String mensaje = String.format(
+            String mensajeCancelacion = String.format(
                     "La sesión programada para el %s ha sido cancelada.",
                     sesion.getFechaHora().toString()
             );
-            notificacionController.enviarNotificacion(mensaje, otroParticipante);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
+            notificacionService.enviarNotificacion(sesion.getUsuario(), mensajeCancelacion);
+            notificacionService.enviarNotificacion(sesion.getAsesor().getUsuario(), mensajeCancelacion);
         }
     }
     

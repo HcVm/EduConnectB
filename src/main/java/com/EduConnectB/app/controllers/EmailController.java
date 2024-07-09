@@ -23,8 +23,8 @@ public class EmailController {
     @PostMapping("/send")
     public String sendEmail(@RequestParam String fromUser, @RequestParam String toUser,
                             @RequestParam String subject, @RequestParam String body) {
-        Usuario from = usuarioRepository.findByNombreUsuario(fromUser);
-        Usuario to = usuarioRepository.findByNombreUsuario(toUser);
+        Usuario from = usuarioRepository.findByNombre(fromUser);
+        Usuario to = usuarioRepository.findByNombre(toUser);
 
         if (from == null || to == null) {
             return "Usuario no encontrado";

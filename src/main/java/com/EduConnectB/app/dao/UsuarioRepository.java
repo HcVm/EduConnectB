@@ -24,7 +24,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     
     Usuario findByTokenRestablecimiento(String token);
     
-    Usuario findByNombreUsuario(String nombre);
+    Usuario findByNombre(String nombre);
    
     
 }
