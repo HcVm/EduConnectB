@@ -29,8 +29,10 @@ public class EmailController {
         if (from == null || to == null) {
             return "Usuario no encontrado";
         }
+        
+        String fullBody = "Correo enviado por: " + from.getNombre() + " (" + from.getCorreoElectronico() + ")\n\n" + body;
 
-        emailService.sendSimpleMessage(to.getCorreoElectronico(), subject, body);
+        emailService.sendSimpleMessage(to.getCorreoElectronico(), subject, fullBody);
         return "Correo enviado exitosamente";
     }
 }
