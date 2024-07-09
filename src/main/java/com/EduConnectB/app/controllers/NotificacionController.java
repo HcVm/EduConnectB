@@ -16,7 +16,8 @@ public class NotificacionController {
 
     @MessageMapping("/notificaciones") // Endpoint para recibir mensajes
     public void enviarNotificacion(@Payload String mensaje, Usuario usuario) {
-        messagingTemplate.convertAndSendToUser(usuario.getCorreoElectronico(), "/notificaciones", mensaje); // Envía la notificación al usuario específico
+        messagingTemplate.convertAndSendToUser(usuario.getCorreoElectronico(), "user/topic/notificaciones", mensaje); // Envía la notificación al usuario específico
     }
 
 }
+	
