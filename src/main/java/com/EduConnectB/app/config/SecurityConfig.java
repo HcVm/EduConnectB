@@ -53,8 +53,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/estudiantes/**").hasAnyAuthority("ESTUDIANTE")
-                .requestMatchers("/asesores/**").hasAuthority("ASESOR")
+                .requestMatchers("/estudiantes/**","/email/**").hasAnyAuthority("ESTUDIANTE")
+                .requestMatchers("/asesores/**", "/email/**").hasAuthority("ASESOR")
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/ws/**","/error","/registro/**", "/login", "/membresias/comprar", "usuarios/current", "/restablecer-contrasena/**").permitAll()
                 .anyRequest().authenticated()
