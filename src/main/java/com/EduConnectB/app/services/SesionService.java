@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.EduConnectB.app.controllers.NotificacionController;
 import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.Sesion;
@@ -82,8 +81,9 @@ public class SesionService {
             sesionRepository.save(sesion);
             
             String mensajeCancelacion = String.format(
-                    "La sesión programada para el %s ha sido cancelada.",
-                    sesion.getFechaHora().toString()
+                    "La sesión programada para el %s ha sido cancelada por %s.",
+                    sesion.getFechaHora().toString(),
+                    usuarioAutenticado.getNombre()
             );
             notificacionService.enviarNotificacion(sesion.getUsuario(), mensajeCancelacion);
             notificacionService.enviarNotificacion(sesion.getAsesor().getUsuario(), mensajeCancelacion);
