@@ -21,7 +21,7 @@ public class ComprobanteService {
         document.open();
 
         // Información del emisor osea nosotros xd
-        Paragraph emisor = new Paragraph("EduConnect", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
+        Paragraph emisor = new Paragraph("EduConnect S.A.C", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
         emisor.setAlignment(Element.ALIGN_CENTER);
         document.add(emisor);
 

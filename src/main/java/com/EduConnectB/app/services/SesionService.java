@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.EduConnectB.app.controllers.NotificacionController;
 import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.Sesion;
@@ -22,6 +23,9 @@ public class SesionService {
 
     @Autowired
     private SesionRepository sesionRepository;
+    
+    @Autowired
+    private NotificacionController notificacionController;
     
     @Autowired
     private JitsiService jitsiService;
@@ -76,6 +80,13 @@ public class SesionService {
             sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
+            
+            Usuario otroParticipante = (sesion.getUsuario().equals(usuarioAutenticado)) ? sesion.getAsesor().getUsuario() : sesion.getUsuario();
+            String mensaje = String.format(
+                    "La sesión programada para el %s ha sido cancelada.",
+                    sesion.getFechaHora().toString()
+            );
+            notificacionController.enviarNotificacion(mensaje, otroParticipante);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
         }
