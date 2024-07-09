@@ -51,6 +51,19 @@ public class NotificacionController {
         return ResponseEntity.noContent().build();
     }
     
+    @DeleteMapping("/{idUsuario}/notificaciones/{indiceNotificacion}")
+    public ResponseEntity<Void> marcarNotificacionComoLeida(
+            @PathVariable Integer idUsuario,
+            @PathVariable int indiceNotificacion) {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null || !usuarioAutenticado.getIdUsuario().equals(idUsuario)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para marcar esta notificación.");
+        }
+
+        notificacionService.marcarNotificacionComoLeida(usuarioAutenticado, indiceNotificacion);
+        return ResponseEntity.noContent().build();
+    }
+    
     public Usuario obtenerUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {

@@ -29,4 +29,15 @@ public class NotificacionService {
         notificacionesPorUsuario.remove(usuario.getIdUsuario());
     }
     
+    public void marcarNotificacionComoLeida(Usuario usuario, int indiceNotificacion) {
+        List<String> notificaciones = notificacionesPorUsuario.get(usuario.getIdUsuario());
+        if (notificaciones != null && indiceNotificacion >= 0 && indiceNotificacion < notificaciones.size()) {
+            notificaciones.remove(indiceNotificacion);
+            if (notificaciones.isEmpty()) {
+                notificacionesPorUsuario.remove(usuario.getIdUsuario());
+            } else {
+                notificacionesPorUsuario.put(usuario.getIdUsuario(), notificaciones);
+            }
+        }
+    }
 }
