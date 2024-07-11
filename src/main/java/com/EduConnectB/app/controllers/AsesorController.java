@@ -1,6 +1,7 @@
 package com.EduConnectB.app.controllers;
 
 import com.EduConnectB.app.dto.ActualizarAsesorRequest;
+import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.TipoUsuario;
@@ -95,6 +96,24 @@ public class AsesorController extends BaseController {
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes ver tus propias sesiones.");
         }
+    }
+    
+    @DeleteMapping("/{idSesion}")
+    public ResponseEntity<Void> cancelarSesion(@PathVariable Integer idSesion) {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
+        }
+        
+        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+
+        if (!tienePermisoParaSesion(sesion, usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
+        }
+
+        sesionService.cancelarSesion(idSesion, usuarioAutenticado);
+        return ResponseEntity.noContent().build();
     }
     
     @GetMapping("/{idAsesor}/horario")

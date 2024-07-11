@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.EduConnectB.app.config.EduConnectUserDetails;
 import com.EduConnectB.app.models.Sesion;
+import com.EduConnectB.app.models.TipoUsuario;
 import com.EduConnectB.app.models.Usuario;
 
 @RestController
@@ -38,7 +39,8 @@ public abstract class BaseController {
     }
     
     protected boolean tienePermisoParaSesion(Sesion sesion, Usuario usuarioAutenticado) {
-        return sesion.getUsuario().equals(usuarioAutenticado) || 
-               sesion.getAsesor().getUsuario().equals(usuarioAutenticado);
-    }
+    	return sesion.getUsuario().equals(usuarioAutenticado) ||
+    	sesion.getAsesor().getUsuario().equals(usuarioAutenticado) ||
+    	usuarioAutenticado.getTipoUsuario() == TipoUsuario.ASESOR ||usuarioAutenticado.getTipoUsuario() == TipoUsuario.ESTUDIANTE;
+    	}
 }

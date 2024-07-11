@@ -78,6 +78,24 @@ public class EstudianteController extends BaseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes ver tus propias sesiones.");
         }
     }
+    
+    @DeleteMapping("/{idSesion}")
+    public ResponseEntity<Void> cancelarSesion(@PathVariable Integer idSesion) {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        if (usuarioAutenticado == null) {
+            throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
+        }
+        
+        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+
+        if (!tienePermisoParaSesion(sesion, usuarioAutenticado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
+        }
+
+        sesionService.cancelarSesion(idSesion, usuarioAutenticado);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/sesiones/{idSesion}/valoraciones")
     public ResponseEntity<Valoracion> valorarSesion(@PathVariable Integer idSesion, @RequestBody Valoracion valoracion) {
