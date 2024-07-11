@@ -64,9 +64,9 @@ public class PagoService {
     private BigDecimal calcularMontoMembresia(TipoMembresia tipoMembresia) {
         switch (tipoMembresia) {
             case ESTUDIANTE_ESTANDAR:
-                return new BigDecimal("100.00");
+                return new BigDecimal("49.99");
             case ESTUDIANTE_PRO:
-                return new BigDecimal("180.00");
+                return new BigDecimal("79.99");
             default:
                 throw new IllegalArgumentException("Tipo de membresía no válido");
         }

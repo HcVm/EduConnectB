@@ -71,7 +71,7 @@ public class EstudianteController extends BaseController {
     @GetMapping("/{idEstudiante}/sesiones")
     public ResponseEntity<List<Sesion>> obtenerSesionesProgramadas(@PathVariable Integer idEstudiante) {
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado != null && usuarioAutenticado.getIdUsuario().equals(idEstudiante)) {
+        if (usuarioAutenticado.getIdUsuario().equals(idEstudiante)) {
             List<Sesion> sesiones = sesionService.obtenerSesionesPorUsuario(idEstudiante);
             return ResponseEntity.ok(sesiones);
         } else {
