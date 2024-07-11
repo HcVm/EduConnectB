@@ -70,7 +70,6 @@ public class SesionService {
         sesionRepository.save(sesion);
     }
 
-    @Transactional
     public void cancelarSesion(Integer idSesion, Usuario usuarioAutenticado) {
         Sesion sesion = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
