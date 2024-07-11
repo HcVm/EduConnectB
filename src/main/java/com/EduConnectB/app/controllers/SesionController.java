@@ -152,25 +152,6 @@ public class SesionController extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada."));
     }
 
-    @DeleteMapping("/{idSesion}")
-    @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
-    public ResponseEntity<Void> cancelarSesion(@PathVariable Integer idSesion) {
-        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
-        if (usuarioAutenticado == null) {
-            throw new AuthenticationRequiredException("Se requiere autenticación para acceder a este recurso.");
-        }
-        
-        Sesion sesion = sesionService.obtenerSesionPorId(idSesion)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
-
-        if (!tienePermisoParaSesion(sesion, usuarioAutenticado)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
-        }
-
-        sesionService.cancelarSesion(idSesion, usuarioAutenticado);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{idSesion}/url-jitsi")
     @PreAuthorize("hasAnyAuthority('ESTUDIANTE', 'ASESOR')")
     public ResponseEntity<String> obtenerUrlJitsi(@PathVariable Integer idSesion) {
