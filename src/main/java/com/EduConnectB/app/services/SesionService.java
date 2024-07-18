@@ -35,7 +35,7 @@ public class SesionService {
     public List<Sesion> obtenerTodasLasSesiones() {
         return sesionRepository.findAll();
     }
-
+    
     public Optional<Sesion> obtenerSesionPorId(Integer idSesion) {
         return sesionRepository.findById(idSesion);
     }
