@@ -52,7 +52,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Correo electrónico no registrado."));
         }
         String tokenRestablecimiento = usuarioService.generarTokenRestablecimiento(usuario);
-        emailService.enviarCorreoRestablecimientoContrasena(usuario, tokenRestablecimiento);
+        emailService.enviarCorreoRestablecimientoContrasena(usuario);
 
         return ResponseEntity.ok(Map.of("tokenRestablecimiento", tokenRestablecimiento));
     }
