@@ -20,46 +20,44 @@ public class EmailService {
     private JavaMailSender mailSender;
 
 	
-	public void enviarCorreoRestablecimientoContrasena(Usuario usuario, String token) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+	public void enviarCorreoRestablecimientoContrasena(Usuario usuario) {
+	    try {
+	        MimeMessage message = mailSender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setTo(usuario.getCorreoElectronico());
-            helper.setSubject("Restablecimiento de contraseña de EduConnect");
+	        helper.setTo(usuario.getCorreoElectronico());
+	        helper.setSubject("Aviso de restablecimiento de contraseña de EduConnect");
 
-            String urlRestablecimiento = "http://tu-frontend/restablecer-contrasena/" + token;
-            String htmlContent = "<html><body style='text-align: center; font-family: sans-serif; max-width: 600px; margin: 0 auto;'>" +
-                    "<div style='background-color: #f0f0f0; padding: 20px;'>" +
-                    "<img src='cid:logo' alt='Logo EduConnectB' style='width: 200px; height: auto; display: block; margin: 0 auto;' />" +
-                    "</div>" +
-                    "<div style='padding: 20px;'>" +
-                    "<h1 style='font-size: 24px; margin-bottom: 20px;'>Restablecimiento de contraseña</h1>" +
-                    "<p>Hola " + usuario.getNombre() + ",</p>" +
-                    "<p>Hemos recibido una solicitud para restablecer tu contraseña.</p>" +
-                    "<p>Si no solicitaste este cambio, puedes ignorar este correo electrónico. Tu contraseña seguirá siendo la misma.</p>" +
-                    "<p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>" +
-                    "<p><a href='" + urlRestablecimiento + "' style='display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;'>Restablecer contraseña</a></p>" +
-                    "<p>Este enlace expirará en 24 horas.</p>" +
-                    "</div>" +
-                    "<div style='background-color: #f0f0f0; padding: 20px;'>" +
-                    "<img src='cid:banner' alt='Banner EduConnectB' style='width: 100%; max-width: 600px; height: auto;' />" +
-                    "</div>" +
-                    "</body></html>";
+	        String htmlContent = "<html><body style='text-align: center; font-family: sans-serif; max-width: 600px; margin: 0 auto;'>" +
+	            "<div style='background-color: #f0f0f0; padding: 20px;'>" +
+	            "<img src='cid:logo' alt='Logo EduConnectB' style='width: 200px; height: auto; display: block; margin: 0 auto;' />" +
+	            "</div>" +
+	            "<div style='padding: 20px;'>" +
+	            "<h1 style='font-size: 24px; margin-bottom: 20px;'>Aviso de restablecimiento de contraseña</h1>" +
+	            "<p>Hola " + usuario.getNombre() + ",</p>" +
+	            "<p>Hemos recibido una solicitud para restablecer tu contraseña.</p>" +
+	            "<p>Si no solicitaste este cambio, por favor contacta con el soporte técnico inmediatamente.</p>" +
+	            "<p>Si fuiste tú quien solicitó el cambio, por favor sigue las instrucciones proporcionadas en la aplicación para completar el proceso de restablecimiento de contraseña.</p>" +
+	            "<p>Este proceso debe completarse en las próximas 24 horas.</p>" +
+	            "</div>" +
+	            "<div style='background-color: #f0f0f0; padding: 20px;'>" +
+	            "<img src='cid:banner' alt='Banner EduConnectB' style='width: 100%; max-width: 600px; height: auto;' />" +
+	            "</div>" +
+	            "</body></html>";
 
-            helper.setText(htmlContent, true);
+	        helper.setText(htmlContent, true);
 
-            ClassPathResource logoImage = new ClassPathResource("static/images/logoEduconnect.png");
-            helper.addInline("logo", logoImage);
+	        ClassPathResource logoImage = new ClassPathResource("static/images/logoEduconnect.png");
+	        helper.addInline("logo", logoImage);
 
-            ClassPathResource bannerImage = new ClassPathResource("static/images/resetpass.jpg");
-            helper.addInline("banner", bannerImage);
+	        ClassPathResource bannerImage = new ClassPathResource("static/images/resetpass.jpg");
+	        helper.addInline("banner", bannerImage);
 
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            e.printStackTrace(); 
-        }
-    }
+	        mailSender.send(message);
+	    } catch (MessagingException e) {
+	        e.printStackTrace();
+	    }
+	}
 	
 	public void enviarCorreoConfirmacionEstudiante(Usuario usuario) {
         try {
