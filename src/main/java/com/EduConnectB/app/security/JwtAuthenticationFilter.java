@@ -8,7 +8,7 @@ import com.EduConnectB.app.config.JwtConfig;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.dao.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws IOException, ServletException {
 
         String header = request.getHeader("Authorization");
