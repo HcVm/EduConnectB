@@ -17,5 +17,5 @@ COPY --from=build /EduConnectB/EduConnectB-0.0.1-SNAPSHOT.jar .
 RUN useradd runtime
 USER runtime
 
-ENTRYPOINT ["java", "-Dserver.port=${PORT}", "-jar", "EduConnectB-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-Dserver.port=${PORT}", "-jar", "EduConnectB-0.0.1-SNAPSHOT.jar"]
 
