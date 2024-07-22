@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.EduConnectB.app.models.Asesor;
@@ -16,7 +17,8 @@ import com.EduConnectB.app.models.Sesion;
 
 @Repository
 public interface SesionRepository extends JpaRepository<Sesion, Integer> {
-	Optional<Sesion> findById(Integer idSesion);
+	@NonNull
+	Optional<Sesion> findById(@NonNull Integer idSesion);
 	List<Sesion> findByUsuarioIdUsuario(Integer idUsuario);
     List<Sesion> findByAsesorIdAsesor(Integer idAsesor);
     
