@@ -15,7 +15,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://educonnect-web.pages.dev/") 
+                        .allowedOrigins("https://educonnect-web.pages.dev/", "http://localhost:5173/") 
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                 		.allowCredentials(true);
