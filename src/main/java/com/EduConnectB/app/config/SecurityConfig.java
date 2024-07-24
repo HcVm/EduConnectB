@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/estudiantes/**","/notiftopic/**").hasAnyAuthority("ESTUDIANTE")
                 .requestMatchers("/asesores/**","/notiftopic/**").hasAuthority("ASESOR")
                 .requestMatchers("/admin/**","/notiftopic/**").hasAuthority("ADMIN")
-                .requestMatchers("/error","/registro/**","/email/**", "/login", "/membresias/comprar", "usuarios/current", "/restablecer-contrasena/**").permitAll()
+                .requestMatchers("/ws/**","/error","/registro/**","/email/**", "/login", "/membresias/comprar", "usuarios/current", "/restablecer-contrasena/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

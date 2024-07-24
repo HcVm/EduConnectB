@@ -14,9 +14,10 @@ public class Notificacion {
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
-    private String tipo;
     private String mensaje;
     private LocalDateTime fechaHora;
+    private boolean leido;
+    
 	public Integer getIdNotificacion() {
 		return idNotificacion;
 	}
@@ -28,12 +29,6 @@ public class Notificacion {
 	}
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
-	}
-	public String getTipo() {
-		return tipo;
-	}
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
 	}
 	public String getMensaje() {
 		return mensaje;
@@ -47,15 +42,20 @@ public class Notificacion {
 	public void setFechaHora(LocalDateTime fechaHora) {
 		this.fechaHora = fechaHora;
 	}
-	public Notificacion(Usuario usuario, String tipo, String mensaje, LocalDateTime fechaHora) {
+	public boolean isLeido() {
+		return leido;
+	}
+	public void setLeido(boolean leido) {
+		this.leido = leido;
+	}
+	public Notificacion(Usuario usuario, String mensaje, LocalDateTime fechaHora, boolean leido) {
 		this.usuario = usuario;
-		this.tipo = tipo;
 		this.mensaje = mensaje;
 		this.fechaHora = fechaHora;
+		this.leido = leido;
 	}
 	public Notificacion() {
 
 	}
-    
-    
+	
 }
