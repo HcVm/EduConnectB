@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.EduConnectB.app.controllers.NotificacionController;
 import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.EstadoSesion;
 import com.EduConnectB.app.models.Sesion;
@@ -24,7 +25,7 @@ public class SesionService {
     private SesionRepository sesionRepository;
     
     @Autowired
-    private NotificacionService notificacionService;
+    private NotificacionController notificacionController;
     
     @Autowired
     private JitsiService jitsiService;
@@ -69,7 +70,8 @@ public class SesionService {
         sesion.setEstado(EstadoSesion.RECHAZADA);
         sesionRepository.save(sesion);
     }
-
+    
+    @Transactional
     public void cancelarSesion(Integer idSesion, Usuario usuarioAutenticado) {
         Sesion sesion = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
@@ -79,13 +81,12 @@ public class SesionService {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
             
-            String mensajeCancelacion = String.format(
-                    "La sesión programada para el %s ha sido cancelada por %s.",
-                    sesion.getFechaHora().toString(),
-                    usuarioAutenticado.getNombre()
+            Usuario otroParticipante = (sesion.getUsuario().equals(usuarioAutenticado)) ? sesion.getAsesor().getUsuario() : sesion.getUsuario();
+            String mensaje = String.format(
+                    "La sesión programada para el %s ha sido cancelada.",
+                    sesion.getFechaHora().toString()
             );
-            notificacionService.enviarNotificacion(sesion.getUsuario(), mensajeCancelacion);
-            notificacionService.enviarNotificacion(sesion.getAsesor().getUsuario(), mensajeCancelacion);
+            notificacionController.enviarNotificacion(mensaje, otroParticipante);
         }
     }
     

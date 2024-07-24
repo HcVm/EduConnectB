@@ -1,43 +1,34 @@
 package com.EduConnectB.app.services;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.EduConnectB.app.dao.NotificacionRepository;
+import com.EduConnectB.app.models.Notificacion;
+import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
+
 
 @Service
 public class NotificacionService {
-	
-	private final Map<Integer, List<String>> notificacionesPorUsuario = new ConcurrentHashMap<>();
 
-    public void enviarNotificacion(Usuario usuario, String mensaje) {
-        List<String> notificaciones = notificacionesPorUsuario.getOrDefault(usuario.getIdUsuario(), new ArrayList<>());
-        notificaciones.add(mensaje);
-        notificacionesPorUsuario.put(usuario.getIdUsuario(), notificaciones);
-    }
+    @Autowired
+    private NotificacionRepository notificacionRepository;
 
-    public List<String> obtenerNotificaciones(Usuario usuario) {
-        return notificacionesPorUsuario.getOrDefault(usuario.getIdUsuario(), Collections.emptyList());
-    }
+    public void enviarNotificacionCancelacionSesion(Usuario destinatario, Sesion sesion) {
+        String mensaje = String.format(
+                "La sesión programada para el %s ha sido cancelada.",
+                sesion.getFechaHora().toString()
+        );
 
-    public void marcarNotificacionesComoLeidas(Usuario usuario) {
-        notificacionesPorUsuario.remove(usuario.getIdUsuario());
-    }
-    
-    public void marcarNotificacionComoLeida(Usuario usuario, int indiceNotificacion) {
-        List<String> notificaciones = notificacionesPorUsuario.get(usuario.getIdUsuario());
-        if (notificaciones != null && indiceNotificacion >= 0 && indiceNotificacion < notificaciones.size()) {
-            notificaciones.remove(indiceNotificacion);
-            if (notificaciones.isEmpty()) {
-                notificacionesPorUsuario.remove(usuario.getIdUsuario());
-            } else {
-                notificacionesPorUsuario.put(usuario.getIdUsuario(), notificaciones);
-            }
-        }
+        Notificacion notificacion = new Notificacion();
+        notificacion.setUsuario(destinatario);
+        notificacion.setMensaje(mensaje);
+        notificacion.setFechaHora(LocalDateTime.now());
+        notificacion.setLeido(false);
+        notificacionRepository.save(notificacion);
+
     }
 }
