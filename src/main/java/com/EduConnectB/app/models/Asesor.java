@@ -4,6 +4,8 @@ package com.EduConnectB.app.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -24,6 +26,7 @@ public class Asesor {
     private String horarioDisponibilidad;
     
     @OneToMany(mappedBy = "asesor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ArchivoAsesor> archivos = new ArrayList<>();
 
 	public Integer getIdAsesor() {
