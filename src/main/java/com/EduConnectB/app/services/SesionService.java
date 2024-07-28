@@ -2,18 +2,21 @@ package com.EduConnectB.app.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.EduConnectB.app.controllers.NotificacionController;
+import com.EduConnectB.app.dao.NotificacionRepository;
 import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.models.EstadoSesion;
+import com.EduConnectB.app.models.Notificacion;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
 
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +28,18 @@ public class SesionService {
     private SesionRepository sesionRepository;
     
     @Autowired
-    private NotificacionController notificacionController;
-    
-    @Autowired
     private JitsiService jitsiService;
     
     @Autowired
     private MembresiaService membresiaService;
+    
+    @Autowired
+    private NotificacionRepository notificacionRepository;
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    
+    
 
     public List<Sesion> obtenerTodasLasSesiones() {
         return sesionRepository.findAll();
@@ -80,15 +88,26 @@ public class SesionService {
             sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
-            
-            Usuario otroParticipante = (sesion.getUsuario().equals(usuarioAutenticado)) ? sesion.getAsesor().getUsuario() : sesion.getUsuario();
-            String mensaje = String.format(
-                    "La sesión programada para el %s ha sido cancelada.",
-                    sesion.getFechaHora().toString()
-            );
-            notificacionController.enviarNotificacion(mensaje, otroParticipante);
+
+            Notificacion notificacionUsuario = new Notificacion();
+            notificacionUsuario.setUsuario(sesion.getUsuario());
+            notificacionUsuario.setMensaje("La sesión con ID " + idSesion + " ha sido cancelada.");
+            notificacionUsuario.setFechaHora(LocalDateTime.now());
+            notificacionUsuario.setLeido(false);
+            notificacionRepository.save(notificacionUsuario);
+
+            Notificacion notificacionAsesor = new Notificacion();
+            notificacionAsesor.setUsuario(sesion.getAsesor().getUsuario());
+            notificacionAsesor.setMensaje("La sesión con ID " + idSesion + " ha sido cancelada.");
+            notificacionAsesor.setFechaHora(LocalDateTime.now());
+            notificacionAsesor.setLeido(false);
+            notificacionRepository.save(notificacionAsesor);
+
+            messagingTemplate.convertAndSend("/topic/notificationes/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
+            messagingTemplate.convertAndSend("/topic/notificationes/" + sesion.getAsesor().getUsuario().getIdUsuario(), notificacionAsesor);
         }
     }
+   
     
     public boolean asesorTuvoSesionesConEstudianteEnPeriodo(Integer idAsesor, Integer idEstudiante, YearMonth mesAnio) {
         LocalDate inicioMes = mesAnio.atDay(1);
