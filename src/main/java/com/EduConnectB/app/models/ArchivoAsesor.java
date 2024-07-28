@@ -2,6 +2,8 @@ package com.EduConnectB.app.models;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class ArchivoAsesor {
     private Integer id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "id_asesor", nullable = false)
     private Asesor asesor;
 
