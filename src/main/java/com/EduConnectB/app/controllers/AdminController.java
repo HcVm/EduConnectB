@@ -136,7 +136,7 @@ public class AdminController extends BaseController {
     
     @GetMapping("/archivos/{archivoId}/descargar")
     public ResponseEntity<byte[]> descargarArchivo(@PathVariable Integer archivoId) throws IOException, DocumentException {
-        byte[] pdfBytes = archivoAsesorService.descargarArchivoComoPDF(archivoId);
+        byte[] pdfBytes = archivoAsesorService.descargarArchivo(archivoId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment",
