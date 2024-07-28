@@ -9,14 +9,19 @@ import com.EduConnectB.app.models.Calificacion;
 import com.EduConnectB.app.models.Informe;
 import com.EduConnectB.app.models.Usuario;
 import com.EduConnectB.app.models.Valoracion;
+import com.EduConnectB.app.services.ArchivoAsesorService;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.CalificacionService;
 import com.EduConnectB.app.services.InformeService;
 import com.EduConnectB.app.services.SesionService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.services.ValoracionService;
+import com.itextpdf.text.DocumentException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -24,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -48,6 +54,9 @@ public class AsesorController extends BaseController {
 
     @Autowired
     private ValoracionService valoracionService;
+    
+    @Autowired
+    private ArchivoAsesorService archivoAsesorService;
 
     @GetMapping("/perfil")
     public ResponseEntity<Asesor> obtenerPerfil() {
@@ -213,5 +222,15 @@ public class AsesorController extends BaseController {
     public ResponseEntity<List<Usuario>> obtenerEstudiantes() {
         List<Usuario> estudiantes = usuarioService.buscarPorTipoUsuario(TipoUsuario.ESTUDIANTE);
         return ResponseEntity.ok(estudiantes);
+    }
+    
+    @GetMapping("/archivos/{archivoId}/descargar")
+    public ResponseEntity<byte[]> descargarArchivo(@PathVariable Integer archivoId) throws IOException, DocumentException {
+        byte[] pdfBytes = archivoAsesorService.descargarArchivoComoPDF(archivoId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment",
+     "Sustento.pdf");
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }
