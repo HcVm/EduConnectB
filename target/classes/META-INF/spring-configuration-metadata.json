@@ -1,12 +1,32 @@
 {
   "groups": [
     {
+      "name": "cloudinary",
+      "type": "com.EduConnectB.app.config.CloudinaryProperties",
+      "sourceType": "com.EduConnectB.app.config.CloudinaryProperties"
+    },
+    {
       "name": "jwt",
       "type": "com.EduConnectB.app.config.JwtConfig",
       "sourceType": "com.EduConnectB.app.config.JwtConfig"
     }
   ],
   "properties": [
+    {
+      "name": "cloudinary.api-key",
+      "type": "java.lang.String",
+      "sourceType": "com.EduConnectB.app.config.CloudinaryProperties"
+    },
+    {
+      "name": "cloudinary.api-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.EduConnectB.app.config.CloudinaryProperties"
+    },
+    {
+      "name": "cloudinary.cloud-name",
+      "type": "java.lang.String",
+      "sourceType": "com.EduConnectB.app.config.CloudinaryProperties"
+    },
     {
       "name": "jwt.expiration-ms",
       "type": "java.lang.Long",
