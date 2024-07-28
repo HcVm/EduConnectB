@@ -15,7 +15,7 @@ public class Asesor {
     private Integer idAsesor;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_usuario", referencedColumnName = "idUsuario")
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     private String especialidad;
