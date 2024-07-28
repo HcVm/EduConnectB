@@ -7,6 +7,7 @@ public class CloudinaryProperties {
     private String cloudName;
     private String apiKey;
     private String apiSecret;
+    
 	public String getCloudName() {
 		return cloudName;
 	}
