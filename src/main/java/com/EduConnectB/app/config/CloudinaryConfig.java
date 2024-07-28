@@ -1,18 +1,27 @@
 package com.EduConnectB.app.config;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CloudinaryConfig {
+	
+	@Autowired
+    private CloudinaryProperties cloudinaryProperties;
 
     @Bean
-    Cloudinary cloudinary() {
-        return new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "dpdfnhsmr",
-                "api_key", "964397669458499",
-                "api_secret", "INFuBokKFtPDIpNCV1Nsdm9X_sA"));
+    Cloudinary cloudinaryConfig() {
+        Map<String, Object> config = new HashMap<>();
+        config.put("cloud_name", cloudinaryProperties.getCloudName());
+        config.put("api_key", cloudinaryProperties.getApiKey());
+        config.put("api_secret", cloudinaryProperties.getApiSecret());
+        return new Cloudinary(config);
+
     }
 }
