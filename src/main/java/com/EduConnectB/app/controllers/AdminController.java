@@ -3,10 +3,15 @@ package com.EduConnectB.app.controllers;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Usuario;
+import com.EduConnectB.app.services.ArchivoAsesorService;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.UsuarioService;
+import com.itextpdf.text.DocumentException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -14,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +35,9 @@ public class AdminController extends BaseController {
 
     @Autowired
     private AsesorService asesorService;
+    
+    @Autowired
+    private ArchivoAsesorService archivoAsesorService;
 
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> obtenerTodosLosUsuarios() {
@@ -134,5 +143,15 @@ public class AdminController extends BaseController {
 
         asesorService.rechazarAsesor(asesor);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/archivos/{archivoId}/descargar")
+    public ResponseEntity<byte[]> descargarArchivo(@PathVariable Integer archivoId) throws IOException, DocumentException {
+        byte[] pdfBytes = archivoAsesorService.descargarArchivoComoPDF(archivoId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment",
+     "Sustento.pdf");
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }
