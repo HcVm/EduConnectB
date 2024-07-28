@@ -15,8 +15,8 @@ public class CloudinaryConfig {
 	@Autowired
     private CloudinaryProperties cloudinaryProperties;
 
-    @Bean
-    Cloudinary cloudinaryConfig() {
+	@Bean
+	Cloudinary cloudinary() {
         Map<String, Object> config = new HashMap<>();
         config.put("cloud_name", cloudinaryProperties.getCloudName());
         config.put("api_key", cloudinaryProperties.getApiKey());
