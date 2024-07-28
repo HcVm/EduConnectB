@@ -20,10 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/admin")
@@ -92,18 +90,9 @@ public class AdminController extends BaseController {
     }
     
     @GetMapping("/asesores/pendientes")
-    public ResponseEntity<List<Map<String, Object>>> obtenerAsesoresPendientesDeAprobacion() {
+    public ResponseEntity<List<Asesor>> obtenerAsesoresPendientesDeAprobacion() {
         List<Asesor> asesoresPendientes = asesorService.obtenerAsesoresPorEstado(EstadoUsuario.PENDIENTE_APROBACION);
-        List<Map<String, Object>> asesoresConArchivos = new ArrayList<>();
-
-        for (Asesor asesor : asesoresPendientes) {
-            Map<String, Object> asesorMap = new HashMap<>();
-            asesorMap.put("asesor", asesor);
-            asesorMap.put("archivos", asesor.getArchivos());
-            asesoresConArchivos.add(asesorMap);
-        }
-
-        return ResponseEntity.ok(asesoresConArchivos);
+        return ResponseEntity.ok(asesoresPendientes);
     }
 
 

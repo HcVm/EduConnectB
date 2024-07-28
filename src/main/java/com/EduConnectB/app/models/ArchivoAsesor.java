@@ -14,8 +14,8 @@ public class ArchivoAsesor {
     private Integer id;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "id_asesor", nullable = false)
+    @JsonBackReference
     private Asesor asesor;
 
     private String nombreArchivo;
