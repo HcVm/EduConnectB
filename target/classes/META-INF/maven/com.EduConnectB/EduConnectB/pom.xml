@@ -65,7 +65,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-<<<<<<< HEAD
 	        <groupId>com.google.apis</groupId>
 	        <artifactId>google-api-services-drive</artifactId>
 	        <version>v3-rev20230822-2.0.0</version>
@@ -81,8 +80,6 @@
 	        <version>1.42.3</version>
 	    </dependency>
 		<dependency>
-=======
->>>>>>> c5b0c88df334b4cd0d8bcfc3e6350381df63bbab
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
