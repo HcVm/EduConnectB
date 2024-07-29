@@ -30,3 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+!**/src/test/**/target/classes/creds.json
+!**/src/main/**/target/classes/creds.json
+
