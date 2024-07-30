@@ -26,7 +26,7 @@ public class NotificacionController {
     @MessageMapping("/notifications")
     public void sendNotification(@Payload Notificacion notificacion) {
         Notificacion savedNotificacion = notificacionService.saveNotificacion(notificacion);
-        messagingTemplate.convertAndSend("/topic/notifications", savedNotificacion);
+        messagingTemplate.convertAndSendToUser(notificacion.getUsuario().getIdUsuario().toString(), "/queue/notifications", savedNotificacion);
     }
 
     @GetMapping("/{userId}")
