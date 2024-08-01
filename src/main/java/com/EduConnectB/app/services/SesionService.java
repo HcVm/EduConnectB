@@ -40,7 +40,6 @@ public class SesionService {
     private SimpMessagingTemplate messagingTemplate;
     
     
-
     public List<Sesion> obtenerTodasLasSesiones() {
         return sesionRepository.findAll();
     }
@@ -62,7 +61,18 @@ public class SesionService {
         if (sesion.getUsuario() != null && !membresiaService.tieneMembresiaActiva(sesion.getUsuario())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El estudiante no tiene una membresía válida para programar sesiones.");
         }
-        return sesionRepository.save(sesion); 
+        Sesion sesionGuardada = sesionRepository.save(sesion);
+
+        Notificacion notificacionAsesor = new Notificacion();
+        notificacionAsesor.setUsuario(sesionGuardada.getAsesor().getUsuario());
+        notificacionAsesor.setMensaje("Tienes una nueva sesión pendiente de aprobación.");
+        notificacionAsesor.setFechaHora(LocalDateTime.now());
+        notificacionAsesor.setLeido(false);
+        notificacionRepository.save(notificacionAsesor);
+
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesionGuardada.getAsesor().getUsuario().getIdUsuario(), notificacionAsesor);
+
+        return sesionGuardada;
     }
     
 
@@ -71,12 +81,30 @@ public class SesionService {
         sesion.setEstado(EstadoSesion.PROGRAMADA);
         sesion.setUrlJitsi(jitsiService.generarUrlSala(sesion.getIdSesion()));
         sesionRepository.save(sesion);
+        
+        Notificacion notificacionUsuario = new Notificacion();
+        notificacionUsuario.setUsuario(sesion.getUsuario());
+        notificacionUsuario.setMensaje("Tu sesión ha sido aceptada y programada para la fecha y hora solicitadas.");
+        notificacionUsuario.setFechaHora(LocalDateTime.now());
+        notificacionUsuario.setLeido(false);
+        notificacionRepository.save(notificacionUsuario);
+
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
     }
 
     @Transactional
     public void rechazarSolicitudSesion(Sesion sesion) {
         sesion.setEstado(EstadoSesion.RECHAZADA);
         sesionRepository.save(sesion);
+        
+        Notificacion notificacionUsuario = new Notificacion();
+        notificacionUsuario.setUsuario(sesion.getUsuario());
+        notificacionUsuario.setMensaje("Tu solicitud de sesión ha sido rechazada. Por favor, busca otro asesor o selecciona otro horario.");
+        notificacionUsuario.setFechaHora(LocalDateTime.now());
+        notificacionUsuario.setLeido(false);
+        notificacionRepository.save(notificacionUsuario);
+
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
     }
     
     @Transactional
