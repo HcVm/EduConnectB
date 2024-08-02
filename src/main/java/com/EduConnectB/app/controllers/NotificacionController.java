@@ -4,9 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.EduConnectB.app.models.Notificacion;
@@ -20,14 +18,6 @@ public class NotificacionController {
     @Autowired
     private NotificacionService notificacionService;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    @MessageMapping("/notifications")
-    public void sendNotification(@Payload Notificacion notificacion) {
-        Notificacion savedNotificacion = notificacionService.saveNotificacion(notificacion);
-        messagingTemplate.convertAndSendToUser(notificacion.getUsuario().getIdUsuario().toString(), "/queue/notifications", savedNotificacion);
-    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<Notificacion>> getNotifications(@PathVariable Integer userId) {

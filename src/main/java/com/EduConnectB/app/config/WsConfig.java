@@ -13,7 +13,7 @@ public class WsConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
-    	config.enableSimpleBroker("/queue", "/topic");
+    	config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
 

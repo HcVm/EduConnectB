@@ -18,7 +18,9 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -62,15 +64,21 @@ public class SesionService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El estudiante no tiene una membresía válida para programar sesiones.");
         }
         Sesion sesionGuardada = sesionRepository.save(sesion);
+        
+        String mensaje = "Tienes una nueva sesión pendiente de aprobación.";
 
         Notificacion notificacionAsesor = new Notificacion();
         notificacionAsesor.setUsuario(sesionGuardada.getAsesor().getUsuario());
-        notificacionAsesor.setMensaje("Tienes una nueva sesión pendiente de aprobación.");
+        notificacionAsesor.setMensaje(mensaje);
         notificacionAsesor.setFechaHora(LocalDateTime.now());
         notificacionAsesor.setLeido(false);
         notificacionRepository.save(notificacionAsesor);
+        
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("id", notificacionAsesor.getIdNotificacion());
+        notificacionData.put("message", mensaje);
 
-        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesionGuardada.getAsesor().getUsuario().getIdUsuario(), notificacionAsesor);
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesionGuardada.getAsesor().getUsuario().getIdUsuario(), notificacionData);
 
         return sesionGuardada;
     }
@@ -82,14 +90,20 @@ public class SesionService {
         sesion.setUrlJitsi(jitsiService.generarUrlSala(sesion.getIdSesion()));
         sesionRepository.save(sesion);
         
+        String mensaje = "Tu sesión ha sido aceptada y programada para la fecha y hora solicitadas.";
+        
         Notificacion notificacionUsuario = new Notificacion();
         notificacionUsuario.setUsuario(sesion.getUsuario());
-        notificacionUsuario.setMensaje("Tu sesión ha sido aceptada y programada para la fecha y hora solicitadas.");
+        notificacionUsuario.setMensaje(mensaje);
         notificacionUsuario.setFechaHora(LocalDateTime.now());
         notificacionUsuario.setLeido(false);
         notificacionRepository.save(notificacionUsuario);
+        
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("id", notificacionUsuario.getIdNotificacion());
+        notificacionData.put("message", mensaje);
 
-        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData);
     }
 
     @Transactional
@@ -97,14 +111,20 @@ public class SesionService {
         sesion.setEstado(EstadoSesion.RECHAZADA);
         sesionRepository.save(sesion);
         
+        String mensaje = "Tu solicitud de sesión ha sido rechazada. Por favor, busca otro asesor o selecciona otro horario.";
+        
         Notificacion notificacionUsuario = new Notificacion();
         notificacionUsuario.setUsuario(sesion.getUsuario());
-        notificacionUsuario.setMensaje("Tu solicitud de sesión ha sido rechazada. Por favor, busca otro asesor o selecciona otro horario.");
+        notificacionUsuario.setMensaje(mensaje);
         notificacionUsuario.setFechaHora(LocalDateTime.now());
         notificacionUsuario.setLeido(false);
         notificacionRepository.save(notificacionUsuario);
+        
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("id", notificacionUsuario.getIdNotificacion());
+        notificacionData.put("message", mensaje);
 
-        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData);
     }
     
     @Transactional
@@ -116,23 +136,33 @@ public class SesionService {
             sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
             sesion.setEstado(EstadoSesion.CANCELADA);
             sesionRepository.save(sesion);
+            
+            String mensaje = "La sesión con ID " + idSesion + " ha sido cancelada.";
 
             Notificacion notificacionUsuario = new Notificacion();
             notificacionUsuario.setUsuario(sesion.getUsuario());
-            notificacionUsuario.setMensaje("La sesión con ID " + idSesion + " ha sido cancelada.");
+            notificacionUsuario.setMensaje(mensaje);
             notificacionUsuario.setFechaHora(LocalDateTime.now());
             notificacionUsuario.setLeido(false);
             notificacionRepository.save(notificacionUsuario);
 
             Notificacion notificacionAsesor = new Notificacion();
             notificacionAsesor.setUsuario(sesion.getAsesor().getUsuario());
-            notificacionAsesor.setMensaje("La sesión con ID " + idSesion + " ha sido cancelada.");
+            notificacionAsesor.setMensaje(mensaje);
             notificacionAsesor.setFechaHora(LocalDateTime.now());
             notificacionAsesor.setLeido(false);
             notificacionRepository.save(notificacionAsesor);
+            
+            Map<String, Object> notificacionData1 = new HashMap<>();
+            notificacionData1.put("id", notificacionUsuario.getIdNotificacion());
+            notificacionData1.put("message", mensaje);
+            
+            Map<String, Object> notificacionData = new HashMap<>();
+            notificacionData.put("id", notificacionAsesor.getIdNotificacion());
+            notificacionData.put("message", mensaje);
 
-            messagingTemplate.convertAndSend("/topic/notificationes/" + sesion.getUsuario().getIdUsuario(), notificacionUsuario);
-            messagingTemplate.convertAndSend("/topic/notificationes/" + sesion.getAsesor().getUsuario().getIdUsuario(), notificacionAsesor);
+            messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData1);
+            messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getAsesor().getUsuario().getIdUsuario(), notificacionData);
         }
     }
    
