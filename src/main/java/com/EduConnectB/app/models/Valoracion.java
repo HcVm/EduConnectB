@@ -19,6 +19,7 @@ public class Valoracion {
 
     private Integer puntuacion;
     private String comentario;
+    
 	public Integer getIdValoracion() {
 		return idValoracion;
 	}

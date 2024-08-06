@@ -16,7 +16,9 @@ import com.EduConnectB.app.services.SesionService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.services.ValoracionService;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -82,8 +85,7 @@ public class AsesorController extends BaseController {
         asesorService.guardarAsesor(asesor);
         return ResponseEntity.ok(asesor);
     }
-
-
+    
     @GetMapping("/{idAsesor}/sesiones")
     public ResponseEntity<List<Sesion>> obtenerSesiones(@PathVariable Integer idAsesor) {
     	Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
@@ -188,33 +190,56 @@ public class AsesorController extends BaseController {
     }
 
     @PostMapping("/estudiantes/{idEstudiante}/informes")
-    public ResponseEntity<Informe> ingresarInforme(
+    public ResponseEntity<?> ingresarInforme(
             @PathVariable Integer idEstudiante,
+            @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate
+     fechaFin,
             @Validated @RequestBody Informe informe,
-            BindingResult bindingResult) {
-        
+            BindingResult bindingResult
+             ) {
+
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(informe);
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors()); 
         }
 
         Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
         if (usuarioAutenticado == null || usuarioAutenticado.getTipoUsuario() != TipoUsuario.ASESOR) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ingresar informes.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para ingresar informes.");
         }
 
         Usuario estudiante = usuarioService.obtenerUsuarioPorId(idEstudiante)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado."));
 
+        List<Calificacion> calificaciones = calificacionService.obtenerCalificacionesPorEstudianteYPeriodo(
+                idEstudiante, fechaInicio, fechaFin);
+        if (calificaciones.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontraron calificaciones en el período especificado.");
+        }
+
+        String contenidoInforme = generarContenidoInforme(calificaciones);
+        informe.setContenido(contenidoInforme);
         informe.setEstudiante(estudiante);
         Informe nuevoInforme = informeService.guardarInforme(informe);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoInforme);
     }
-    
+
     @GetMapping("/estudiantes")
     public ResponseEntity<List<Usuario>> obtenerEstudiantes() {
         List<Usuario> estudiantes = usuarioService.buscarPorTipoUsuario(TipoUsuario.ESTUDIANTE);
         return ResponseEntity.ok(estudiantes);
     }
     
-    
+    private String generarContenidoInforme(List<Calificacion> calificaciones) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Informe de calificaciones:\n\n");
+        for (Calificacion calificacion : calificaciones) {
+            sb.append("Materia: ").append(calificacion.getNombreMateria()).append("\n");
+            sb.append("Calificación: ").append(calificacion.getCalificacion()).append("\n");
+            sb.append("Fecha: ").append(calificacion.getFecha()).append("\n");
+            sb.append("Comentario: ").append(calificacion.getComentario()).append("\n\n");
+        }
+        return sb.toString();
+    }
 }

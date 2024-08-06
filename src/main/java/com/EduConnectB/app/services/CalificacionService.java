@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.EduConnectB.app.dao.CalificacionRepository;
 import com.EduConnectB.app.models.Calificacion;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,5 +38,11 @@ public class CalificacionService {
 
     public void eliminarCalificacion(Integer idCalificacion) {
         calificacionRepository.deleteById(idCalificacion);
+    }
+    
+    public List<Calificacion> obtenerCalificacionesPorEstudianteYPeriodo(
+            Integer idEstudiante, LocalDate fechaInicio, LocalDate fechaFin) {
+        
+        return calificacionRepository.findCalificacionesByEstudianteAndFechaBetween(idEstudiante, fechaInicio, fechaFin);
     }
 }
