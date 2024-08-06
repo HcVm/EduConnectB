@@ -1,3 +1,4 @@
+com\EduConnectB\app\config\CloudinaryProperties.class
 com\EduConnectB\app\models\Pago.class
 com\EduConnectB\app\dao\CalificacionRepository.class
 com\EduConnectB\app\dao\SesionRepository.class
@@ -12,6 +13,7 @@ com\EduConnectB\app\models\ArchivoAsesor.class
 com\EduConnectB\app\models\EstadoUsuario.class
 com\EduConnectB\app\config\AdminUserInitializer.class
 com\EduConnectB\app\models\Informe.class
+com\EduConnectB\app\services\BackupService.class
 com\EduConnectB\app\config\CorsConfig.class
 com\EduConnectB\app\dto\ActualizarUsuarioRequest.class
 com\EduConnectB\app\dao\NotificacionRepository.class
@@ -27,6 +29,7 @@ com\EduConnectB\app\models\Membresia.class
 com\EduConnectB\app\exceptions\AuthenticationRequiredException.class
 com\EduConnectB\app\dao\ValoracionRepository.class
 com\EduConnectB\app\models\Mensaje.class
+com\EduConnectB\app\controllers\BackupController.class
 com\EduConnectB\app\services\PagoService.class
 com\EduConnectB\app\controllers\AuthController.class
 com\EduConnectB\app\dto\ActualizarAsesorRequest.class
@@ -40,6 +43,7 @@ com\EduConnectB\app\config\CloudinaryConfig.class
 com\EduConnectB\app\services\SesionService.class
 com\EduConnectB\app\controllers\AdminController.class
 com\EduConnectB\app\config\JwtFilterConfig.class
+com\EduConnectB\app\config\WsConfig.class
 com\EduConnectB\app\dao\InformeRepository.class
 com\EduConnectB\app\models\Usuario.class
 com\EduConnectB\app\services\AsesorService$1.class
@@ -70,6 +74,7 @@ com\EduConnectB\app\config\SecurityConfig.class
 com\EduConnectB\app\controllers\RegistroController.class
 com\EduConnectB\app\services\PagoService$1.class
 com\EduConnectB\app\security\TemporalTokenAuthenticationFilter.class
+com\EduConnectB\app\services\ArchivoAsesorService.class
 com\EduConnectB\app\security\JwtAuthenticationFilter.class
 com\EduConnectB\app\controllers\MembresiaController.class
 com\EduConnectB\app\models\TipoUsuario.class

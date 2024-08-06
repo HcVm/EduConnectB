@@ -1,14 +1,17 @@
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\AdminUserInitializer.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\CloudinaryConfig.java
+C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\CloudinaryProperties.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\CorsConfig.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\EduConnectUserDetails.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\JwtConfig.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\JwtFilterConfig.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\MailConfig.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\SecurityConfig.java
+C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\config\WsConfig.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\AdminController.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\AsesorController.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\AuthController.java
+C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\BackupController.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\BaseController.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\EmailController.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\controllers\EstudianteController.java
@@ -55,7 +58,9 @@ C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\models\Val
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\security\JwtAuthenticationFilter.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\security\JwtService.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\security\TemporalTokenAuthenticationFilter.java
+C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\ArchivoAsesorService.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\AsesorService.java
+C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\BackupService.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\BibliotecaDigitalService.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\CalificacionService.java
 C:\Users\HcVg\Documents\EduConnectB\src\main\java\com\EduConnectB\app\services\ComprobanteService.java
