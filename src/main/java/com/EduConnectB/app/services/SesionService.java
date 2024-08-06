@@ -15,6 +15,7 @@ import com.EduConnectB.app.models.Usuario;
 
 import jakarta.transaction.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -22,6 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SesionService {
@@ -40,6 +44,8 @@ public class SesionService {
     
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     
     
     public List<Sesion> obtenerTodasLasSesiones() {
@@ -79,11 +85,13 @@ public class SesionService {
         notificacionData.put("message", mensaje);
 
         messagingTemplate.convertAndSend("/topic/notificaciones/" + sesionGuardada.getAsesor().getUsuario().getIdUsuario(), notificacionData);
-
+        
+        programarRecordatorio(sesionGuardada);
+        
         return sesionGuardada;
+        
     }
     
-
 	@Transactional
     public void aceptarSolicitudSesion(Sesion sesion) {
         sesion.setEstado(EstadoSesion.PROGRAMADA);
@@ -102,8 +110,22 @@ public class SesionService {
         Map<String, Object> notificacionData = new HashMap<>();
         notificacionData.put("id", notificacionUsuario.getIdNotificacion());
         notificacionData.put("message", mensaje);
+        
+        Map<String, Object> sesionData = new HashMap<>();
+        sesionData.put("idSesion", sesion.getIdSesion());
+        sesionData.put("fechaHora", sesion.getFechaHora());
+        sesionData.put("estado", sesion.getEstado().toString());
+        sesionData.put("urlJitsi", sesion.getUrlJitsi());
+        
+        Map<String, Object> asesorData = new HashMap<>();
+        asesorData.put("usuario", sesion.getAsesor().getUsuario());
+        sesionData.put("asesor", asesorData);
+
+        System.out.println("Datos de sesión enviados: " + sesionData);
+
 
         messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData);
+        messagingTemplate.convertAndSend("/topic/sesiones/" + sesion.getUsuario().getIdUsuario(), sesionData);
     }
 
     @Transactional
@@ -160,9 +182,23 @@ public class SesionService {
             Map<String, Object> notificacionData = new HashMap<>();
             notificacionData.put("id", notificacionAsesor.getIdNotificacion());
             notificacionData.put("message", mensaje);
+            
+            Map<String, Object> sesionData = new HashMap<>();
+            sesionData.put("idSesion", sesion.getIdSesion());
+            sesionData.put("fechaHora", sesion.getFechaHora());
+            sesionData.put("estado", sesion.getEstado().toString());
+            sesionData.put("urlJitsi", sesion.getUrlJitsi());
+            
+            Map<String, Object> asesorData = new HashMap<>();
+            asesorData.put("usuario", sesion.getAsesor().getUsuario());
+            sesionData.put("asesor", asesorData);
+
+            System.out.println("Datos de sesión enviados: " + sesionData);
 
             messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData1);
             messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getAsesor().getUsuario().getIdUsuario(), notificacionData);
+            messagingTemplate.convertAndSend("/topic/sesiones/" + sesion.getUsuario().getIdUsuario(), sesionData);
+            messagingTemplate.convertAndSend("/topic/sesiones/" + sesion.getAsesor().getUsuario().getIdUsuario(), sesionData);
         }
     }
    
@@ -171,5 +207,45 @@ public class SesionService {
         LocalDate inicioMes = mesAnio.atDay(1);
         LocalDate finMes = mesAnio.atEndOfMonth();
         return sesionRepository.existsByAsesorIdAsesorAndUsuarioIdUsuarioAndFechaHoraBetween(idAsesor, idEstudiante, inicioMes, finMes);
+    }
+    
+    private void programarRecordatorio(Sesion sesion) {
+        LocalDateTime fechaHoraSesion = sesion.getFechaHora();
+        LocalDateTime ahora = LocalDateTime.now();
+        long minutosAntesSesion = Duration.between(ahora, fechaHoraSesion).toMinutes() - 30;
+
+        if (minutosAntesSesion > 0) {
+            scheduler.schedule(() -> enviarRecordatorio(sesion), minutosAntesSesion, TimeUnit.MINUTES);
+        }
+    }
+    
+    private void enviarRecordatorio(Sesion sesion) {
+        String mensaje = "Recordatorio: Tienes una sesión programada en 30 minutos.";
+
+        Notificacion notificacionUsuario = new Notificacion();
+        notificacionUsuario.setUsuario(sesion.getUsuario());
+        notificacionUsuario.setMensaje(mensaje);
+        notificacionUsuario.setFechaHora(LocalDateTime.now());
+        notificacionUsuario.setLeido(false);
+        notificacionRepository.save(notificacionUsuario);
+
+        Map<String, Object> notificacionData = new HashMap<>();
+        notificacionData.put("id", notificacionUsuario.getIdNotificacion());
+        notificacionData.put("message", mensaje);
+
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getUsuario().getIdUsuario(), notificacionData);
+
+        Notificacion notificacionAsesor = new Notificacion();
+        notificacionAsesor.setUsuario(sesion.getAsesor().getUsuario());
+        notificacionAsesor.setMensaje(mensaje);
+        notificacionAsesor.setFechaHora(LocalDateTime.now());
+        notificacionAsesor.setLeido(false);
+        notificacionRepository.save(notificacionAsesor);
+
+        Map<String, Object> notificacionData1 = new HashMap<>();
+        notificacionData1.put("id", notificacionAsesor.getIdNotificacion());
+        notificacionData1.put("message", mensaje);
+
+        messagingTemplate.convertAndSend("/topic/notificaciones/" + sesion.getAsesor().getUsuario().getIdUsuario(), notificacionData1);
     }
 }
