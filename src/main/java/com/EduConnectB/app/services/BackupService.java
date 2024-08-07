@@ -53,7 +53,7 @@ public class BackupService {
     private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_FILE);
-    private static final String CREDENTIALS_FILE_PATH = "";
+    private static final String CREDENTIALS_FILE_PATH = "/etc/secrets/keysgdrive";
 
     private String railwayDbHost = "viaduct.proxy.rlwy.net";
     private String railwayDbPort = "25703";
