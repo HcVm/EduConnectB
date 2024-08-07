@@ -40,7 +40,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
 import java.io.FileInputStream;
-
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 
@@ -166,8 +166,13 @@ public class BackupService {
     }
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        java.io.File credentialsFile = new java.io.File(BackupService.class.getResource(CREDENTIALS_FILE_PATH).getFile());
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(credentialsFile)));
+        java.io.File credentialsFile = new java.io.File(CREDENTIALS_FILE_PATH);
+        if (!credentialsFile.exists()) {
+            throw new FileNotFoundException("El archivo de credenciales no se encontró en " + CREDENTIALS_FILE_PATH);
+        }
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
+                JSON_FACTORY, new InputStreamReader(new FileInputStream(credentialsFile)));
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
