@@ -5,6 +5,7 @@ import com.EduConnectB.app.dto.ActualizarUsuarioRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Calificacion;
+import com.EduConnectB.app.models.Informe;
 import com.EduConnectB.app.models.RecursoBiblioteca;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
@@ -12,6 +13,7 @@ import com.EduConnectB.app.models.Valoracion;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.BibliotecaDigitalService;
 import com.EduConnectB.app.services.CalificacionService;
+import com.EduConnectB.app.services.InformeService;
 import com.EduConnectB.app.services.SesionService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.services.ValoracionService;
@@ -30,7 +32,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/estudiantes")
-@PreAuthorize("hasAnyAuthority('ESTUDIANTE')")
+@PreAuthorize("hasAuthority('ESTUDIANTE')")
 public class EstudianteController extends BaseController {
 
     @Autowired
@@ -47,6 +49,9 @@ public class EstudianteController extends BaseController {
 
     @Autowired
     private ValoracionService valoracionService;
+    
+    @Autowired
+    private InformeService informeService;
     
     @Autowired
     private BibliotecaDigitalService bibliotecaDigitalService;
@@ -155,6 +160,18 @@ public class EstudianteController extends BaseController {
             return ResponseEntity.ok(usuarioAutenticado);
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No estás autenticado.");
+        }
+    }
+    
+    @GetMapping("/{idEstudiante}/informes") 
+    public ResponseEntity<List<Informe>> obtenerInformes(@PathVariable Integer idEstudiante) {
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+
+        if (usuarioAutenticado != null && usuarioAutenticado.getIdUsuario().equals(idEstudiante)) {
+            List<Informe> informes = informeService.obtenerInformesPorEstudiante(idEstudiante);
+            return ResponseEntity.ok(informes);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo puedes ver tus propios informes.");
         }
     }
 

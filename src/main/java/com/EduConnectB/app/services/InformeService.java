@@ -30,4 +30,8 @@ public class InformeService {
     public void eliminarInforme(Integer idInforme) {
         informeRepository.deleteById(idInforme);
     }
+    
+    public List<Informe> obtenerInformesPorEstudiante(Integer idEstudiante) {
+        return informeRepository.findInformesByEstudiante(idEstudiante);
+    }
 }
