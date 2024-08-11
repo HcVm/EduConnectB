@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -220,6 +221,7 @@ public class AsesorController extends BaseController {
         String contenidoInforme = generarContenidoInforme(calificaciones);
         informe.setContenido(contenidoInforme);
         informe.setEstudiante(estudiante);
+        informe.setFecha(new Timestamp(System.currentTimeMillis()));
         Informe nuevoInforme = informeService.guardarInforme(informe);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoInforme);
@@ -238,7 +240,7 @@ public class AsesorController extends BaseController {
             sb.append("Materia: ").append(calificacion.getNombreMateria()).append("\n");
             sb.append("Calificación: ").append(calificacion.getCalificacion()).append("\n");
             sb.append("Fecha: ").append(calificacion.getFecha()).append("\n");
-            sb.append("Comentario: ").append(calificacion.getComentario()).append("\n\n");
+            sb.append("Comentario: ").append(calificacion.getComentario()).append("\n");
         }
         return sb.toString();
     }

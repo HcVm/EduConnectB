@@ -1,6 +1,7 @@
 package com.EduConnectB.app.controllers;
 
 
+import com.EduConnectB.app.dao.SesionRepository;
 import com.EduConnectB.app.dto.ActualizarUsuarioRequest;
 import com.EduConnectB.app.exceptions.AuthenticationRequiredException;
 import com.EduConnectB.app.models.Asesor;
@@ -17,6 +18,9 @@ import com.EduConnectB.app.services.InformeService;
 import com.EduConnectB.app.services.SesionService;
 import com.EduConnectB.app.services.UsuarioService;
 import com.EduConnectB.app.services.ValoracionService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +44,9 @@ public class EstudianteController extends BaseController {
 
     @Autowired
     private SesionService sesionService;
+    
+    @Autowired
+    private SesionRepository sesionRepository;
     
     @Autowired
     private UsuarioService usuarioService;
@@ -105,6 +112,10 @@ public class EstudianteController extends BaseController {
     @PostMapping("/sesiones/{idSesion}/valoraciones")
     public ResponseEntity<Valoracion> valorarSesion(@PathVariable Integer idSesion, @RequestBody Valoracion valoracion) {
         valoracion.setUsuario(obtenerUsuarioAutenticado());
+        
+        Sesion sesion = sesionRepository.findById(idSesion)
+                .orElseThrow(() -> new EntityNotFoundException("Sesión no encontrada"));
+        valoracion.setSesion(sesion);
         Valoracion nuevaValoracion = valoracionService.guardarValoracion(valoracion);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaValoracion);
     }

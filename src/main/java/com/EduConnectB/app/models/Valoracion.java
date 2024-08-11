@@ -16,7 +16,7 @@ public class Valoracion {
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
-
+    
     private Integer puntuacion;
     private String comentario;
     

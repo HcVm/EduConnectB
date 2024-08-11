@@ -67,7 +67,6 @@ public class MembresiaService {
         }
     }
 
-
     @Transactional
     public void cancelarMembresia(Usuario usuario) {
         Membresia membresia = membresiaRepository.findByUsuario(usuario);

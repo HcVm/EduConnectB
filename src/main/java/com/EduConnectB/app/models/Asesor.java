@@ -4,6 +4,7 @@ package com.EduConnectB.app.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -24,6 +25,10 @@ public class Asesor {
     
     @Column(columnDefinition = "json")
     private String horarioDisponibilidad;
+    
+    @OneToMany(mappedBy = "asesor")
+    @JsonIgnore 
+    private List<Sesion> sesiones = new ArrayList<>(); 
     
     @OneToMany(mappedBy = "asesor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
