@@ -6,12 +6,14 @@ import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Pago;
 import com.EduConnectB.app.models.Sesion;
 import com.EduConnectB.app.models.Usuario;
+import com.EduConnectB.app.models.Valoracion;
 import com.EduConnectB.app.services.ArchivoAsesorService;
 import com.EduConnectB.app.services.AsesorService;
 import com.EduConnectB.app.services.MembresiaService;
 import com.EduConnectB.app.services.PagoService;
 import com.EduConnectB.app.services.SesionService;
 import com.EduConnectB.app.services.UsuarioService;
+import com.EduConnectB.app.services.ValoracionService;
 import com.itextpdf.text.DocumentException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,9 @@ public class AdminController extends BaseController {
     
     @Autowired
     private PagoService pagoService;
+    
+    @Autowired
+    private ValoracionService valoracionService;
 
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> obtenerTodosLosUsuarios() {
@@ -176,5 +181,11 @@ public class AdminController extends BaseController {
     public ResponseEntity<List<Pago>> obtenerTodosLosPagos() {
         List<Pago> pagos = pagoService.obtenerTodosLosPagos();
         return ResponseEntity.ok(pagos);
+    }
+    
+    @GetMapping("/valoraciones")
+    public ResponseEntity<List<Valoracion>> obtenerTodasLasValoraciones() {
+        List<Valoracion> valoraciones = valoracionService.obtenerTodasLasValoraciones();
+        return ResponseEntity.ok(valoraciones);
     }
 }
