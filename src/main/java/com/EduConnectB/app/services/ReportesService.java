@@ -16,7 +16,6 @@ import com.EduConnectB.app.dao.MembresiaRepository;
 import com.EduConnectB.app.dao.PagoRepository;
 import com.EduConnectB.app.dao.ValoracionRepository;
 import com.EduConnectB.app.dto.MembresiaDTO;
-import com.EduConnectB.app.dto.MembresiasResponse;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Pago;

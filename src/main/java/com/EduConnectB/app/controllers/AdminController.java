@@ -1,7 +1,6 @@
 package com.EduConnectB.app.controllers;
 
 import com.EduConnectB.app.dto.MembresiaDTO;
-import com.EduConnectB.app.dto.MembresiasResponse;
 import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.EstadoUsuario;
 import com.EduConnectB.app.models.Membresia;
@@ -234,7 +233,5 @@ public class AdminController extends BaseController {
     public ResponseEntity<Map<Asesor, Double>> obtenerRendimientoAsesores() {
         Map<Asesor, Double> rendimientoAsesores = reportesService.obtenerRendimientoAsesores();
         return ResponseEntity.ok(rendimientoAsesores);
-    }
-    
-    
+    }   
 }
