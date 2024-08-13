@@ -230,8 +230,13 @@ public class AdminController extends BaseController {
     }
     
     @GetMapping("/reportes/rendimiento/asesores")
-    public ResponseEntity<Map<Asesor, Double>> obtenerRendimientoAsesores() {
-        Map<Asesor, Double> rendimientoAsesores = reportesService.obtenerRendimientoAsesores();
+    public ResponseEntity<Map<String, Map<String, Object>>> obtenerRendimientoAsesoresPorPeriodo(
+            @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate
+     fechaFin) {
+
+        Map<String,
+     Map<String, Object>> rendimientoAsesores = reportesService.obtenerRendimientoAsesoresPorPeriodo(fechaInicio, fechaFin);
         return ResponseEntity.ok(rendimientoAsesores);
-    }   
+    }  
 }

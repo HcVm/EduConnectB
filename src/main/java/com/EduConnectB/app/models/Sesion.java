@@ -2,6 +2,7 @@ package com.EduConnectB.app.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.validation.ObjectError;
@@ -25,6 +26,9 @@ public class Sesion {
     
     @Enumerated(EnumType.STRING)
     private EstadoSesion estado;
+    
+    @OneToOne(mappedBy = "sesion")
+    private Valoracion valoracion;
     
     private String urlJitsi;
     
@@ -71,6 +75,14 @@ public class Sesion {
 		this.estado = estado;
 	}
 
+	public Valoracion getValoracion() {
+		return valoracion;
+	}
+
+	public void setValoracion(Valoracion valoracion) {
+		this.valoracion = valoracion;
+	}
+
 	public String getUrlJitsi() {
 		return urlJitsi;
 	}
@@ -87,17 +99,20 @@ public class Sesion {
 		this.errores = errores;
 	}
 
-	public Sesion(Usuario usuario, Asesor asesor, LocalDateTime fechaHora, EstadoSesion estado,
-			List<ObjectError> errores) {
+	public Sesion(Usuario usuario, Asesor asesor, LocalDateTime fechaHora, EstadoSesion estado, Valoracion valoracion,
+			String urlJitsi, List<ObjectError> errores) {
 		this.usuario = usuario;
 		this.asesor = asesor;
 		this.fechaHora = fechaHora;
 		this.estado = estado;
+		this.valoracion = valoracion;
+		this.urlJitsi = urlJitsi;
 		this.errores = errores;
 	}
 
 	public Sesion() {
 
 	}
-    
+
+	
 }

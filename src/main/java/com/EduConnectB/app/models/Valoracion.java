@@ -9,8 +9,8 @@ public class Valoracion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idValoracion;
 
-    @ManyToOne
-    @JoinColumn(name = "id_sesion")
+    @OneToOne
+    @JoinColumn(name = "sesion_id")
     private Sesion sesion;
 
     @ManyToOne
@@ -19,7 +19,6 @@ public class Valoracion {
     
     private Integer puntuacion;
     private String comentario;
-    
 	public Integer getIdValoracion() {
 		return idValoracion;
 	}
@@ -57,7 +56,5 @@ public class Valoracion {
 		this.comentario = comentario;
 	}
 	public Valoracion() {
-
-	} 
-    
+	}
 }

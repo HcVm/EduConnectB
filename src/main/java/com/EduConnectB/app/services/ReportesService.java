@@ -72,13 +72,23 @@ public class ReportesService {
                            .orElse(0.0);
     }
 
-    public Map<Asesor, Double> obtenerRendimientoAsesores() {
-        List<Asesor> asesores = asesorRepository.findAll();
-        Map<Asesor, Double> rendimientoMap = new HashMap<>();
+    public Map<String, Map<String, Object>> obtenerRendimientoAsesoresPorPeriodo(LocalDate fechaInicio, LocalDate fechaFin) {
+        LocalDateTime inicio = fechaInicio.atStartOfDay();
+        LocalDateTime fin = fechaFin.atTime(23, 59, 59);
 
-        for (Asesor asesor : asesores) {
-            Double promedioPuntuacion = calcularPromedioPuntuaciones(asesor.getIdAsesor());
-            rendimientoMap.put(asesor, promedioPuntuacion);
+        List<Object[]> resultados = valoracionRepository.findRendimientoAsesoresByPeriodo(inicio, fin);
+        Map<String, Map<String, Object>> rendimientoMap = new HashMap<>();
+
+        for (Object[] resultado : resultados) {
+            String asesor = (String) resultado[0];
+            String materia = (String) resultado[1];
+            Long cantidadSesiones = (Long) resultado[2];
+            Double promedioPuntuacion = (Double) resultado[3];
+
+            Map<String, Object> detallesAsesor = rendimientoMap.computeIfAbsent(asesor, k -> new HashMap<>());
+            detallesAsesor.put("materia", materia);
+            detallesAsesor.put("cantidadSesiones", cantidadSesiones);
+            detallesAsesor.put("promedioPuntuacion", promedioPuntuacion);
         }
 
         return rendimientoMap;
