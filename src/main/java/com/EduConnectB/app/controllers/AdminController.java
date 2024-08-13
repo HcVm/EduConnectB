@@ -34,11 +34,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -231,18 +230,24 @@ public class AdminController extends BaseController {
     }
     
     @GetMapping("/reportes/rendimiento/asesores")
-    public ResponseEntity<List<Map<String, Object>>> obtenerRendimientoAsesoresPorPeriodo(
+    public ResponseEntity<Map<String, Object>> obtenerRendimientoAsesoresPorPeriodo(
             @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
 
         Map<String, Map<String, Object>> rendimientoAsesoresMap = reportesService.obtenerRendimientoAsesoresPorPeriodo(fechaInicio, fechaFin);
-        List<Map<String, Object>> rendimientoAsesoresList = new ArrayList<>();
-        for (Map.Entry<String, Map<String, Object>> entry : rendimientoAsesoresMap.entrySet()) {
-            Map<String, Object> asesorData = entry.getValue();
-            asesorData.put("asesor", entry.getKey());
-            rendimientoAsesoresList.add(asesorData);
-        }
 
-        return ResponseEntity.ok(rendimientoAsesoresList);
+        List<Map<String, Object>> rendimientoAsesoresList = rendimientoAsesoresMap.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> asesorData = new HashMap<>(entry.getValue());
+                    asesorData.put("asesor", entry.getKey()); 
+                    return asesorData;
+                })
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("valoraciones", rendimientoAsesoresList);
+
+        return ResponseEntity.ok(response);
     }
+
 }

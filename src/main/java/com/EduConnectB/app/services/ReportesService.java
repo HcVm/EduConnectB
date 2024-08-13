@@ -11,12 +11,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EduConnectB.app.dao.AsesorRepository;
 import com.EduConnectB.app.dao.MembresiaRepository;
 import com.EduConnectB.app.dao.PagoRepository;
 import com.EduConnectB.app.dao.ValoracionRepository;
 import com.EduConnectB.app.dto.MembresiaDTO;
-import com.EduConnectB.app.models.Asesor;
 import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Pago;
 import com.EduConnectB.app.models.Valoracion;
@@ -33,9 +31,6 @@ public class ReportesService {
     
     @Autowired
     private ValoracionRepository valoracionRepository;
-
-    @Autowired
-    private AsesorRepository asesorRepository;
 
     public BigDecimal calcularGananciasTotales(LocalDateTime inicio, LocalDateTime fin) {
         return pagoRepository.sumarMontoPorPeriodo(inicio, fin);

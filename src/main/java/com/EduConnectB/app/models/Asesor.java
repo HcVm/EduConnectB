@@ -1,6 +1,5 @@
 package com.EduConnectB.app.models;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
