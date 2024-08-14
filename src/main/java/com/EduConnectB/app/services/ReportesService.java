@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import com.EduConnectB.app.dao.MembresiaRepository;
 import com.EduConnectB.app.dao.PagoRepository;
 import com.EduConnectB.app.dao.ValoracionRepository;
+import com.EduConnectB.app.dto.AsesorDTO;
 import com.EduConnectB.app.dto.MembresiaDTO;
+import com.EduConnectB.app.dto.SesionDTO;
+import com.EduConnectB.app.dto.ValoracionDTO;
 import com.EduConnectB.app.models.Membresia;
 import com.EduConnectB.app.models.Pago;
 import com.EduConnectB.app.models.Valoracion;
@@ -75,15 +78,40 @@ public class ReportesService {
         Map<String, Map<String, Object>> rendimientoMap = new HashMap<>();
 
         for (Object[] resultado : resultados) {
-            String asesor = (String) resultado[0];
+            String asesorNombre = (String) resultado[0];
             String materia = (String) resultado[1];
             Long cantidadSesiones = (Long) resultado[2];
             Double promedioPuntuacion = (Double) resultado[3];
 
-            Map<String, Object> detallesAsesor = rendimientoMap.computeIfAbsent(asesor, k -> new HashMap<>());
+            Map<String, Object> detallesAsesor = rendimientoMap.computeIfAbsent(asesorNombre, k -> new HashMap<>());
             detallesAsesor.put("materia", materia);
             detallesAsesor.put("cantidadSesiones", cantidadSesiones);
             detallesAsesor.put("promedioPuntuacion", promedioPuntuacion);
+
+            List<Valoracion> valoracionesAsesor = valoracionRepository.findBySesionAsesorUsuarioNombreAndSesionFechaHoraBetween(
+                    asesorNombre, inicio, fin);
+
+            List<ValoracionDTO> valoracionesDTO = valoracionesAsesor.stream()
+                    .map(valoracion -> {
+                        SesionDTO sesionDTO = new SesionDTO();
+                        sesionDTO.setIdSesion(valoracion.getSesion().getIdSesion());
+                        sesionDTO.setFechaHora(valoracion.getSesion().getFechaHora());
+
+                        AsesorDTO asesorDTO = new AsesorDTO();
+                        asesorDTO.setIdAsesor(valoracion.getSesion().getAsesor().getIdAsesor());
+                        asesorDTO.setNombre(valoracion.getSesion().getAsesor().getUsuario().getNombre());
+                        asesorDTO.setEspecialidad(valoracion.getSesion().getAsesor().getEspecialidad());
+                        sesionDTO.setAsesor(asesorDTO);
+
+                        ValoracionDTO valoracionDTO = new ValoracionDTO();
+                        valoracionDTO.setIdValoracion(valoracion.getIdValoracion());
+                        valoracionDTO.setPuntuacion(valoracion.getPuntuacion());
+                        valoracionDTO.setComentario(valoracion.getComentario());
+                        valoracionDTO.setSesion(sesionDTO);
+                        return valoracionDTO;
+                    })
+                    .collect(Collectors.toList());
+            detallesAsesor.put("valoraciones", valoracionesDTO);
         }
 
         return rendimientoMap;

@@ -17,6 +17,15 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Integer>
 	 
 	 List<Valoracion> findBySesionAsesorIdAsesor(Integer idAsesor);
 	 
+	 @Query("SELECT v FROM Valoracion v " +
+	           "JOIN v.sesion s " +
+	           "JOIN s.asesor a " +
+	           "WHERE a.usuario.nombre = :asesorNombre AND s.fechaHora BETWEEN :fechaInicio AND :fechaFin")
+	    List<Valoracion> findBySesionAsesorUsuarioNombreAndSesionFechaHoraBetween(
+	            @Param("asesorNombre") String asesorNombre,
+	            @Param("fechaInicio") LocalDateTime fechaInicio,
+	            @Param("fechaFin") LocalDateTime fechaFin);
+	 
 	 @Query("SELECT a.usuario.nombre AS asesor, a.especialidad AS materia, COUNT(DISTINCT ses) AS cantidadSesiones, COALESCE(AVG(v.puntuacion), 0) AS promedio " +
 		       "FROM Asesor a " +
 		       "LEFT JOIN a.sesiones ses ON ses.fechaHora BETWEEN :fechaInicio AND :fechaFin " +

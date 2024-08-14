@@ -1,5 +1,4 @@
 package com.EduConnectB.app.models;
-
 import jakarta.persistence.*;
 
 @Entity
