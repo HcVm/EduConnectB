@@ -91,7 +91,7 @@ public class ReportesService {
             List<Valoracion> valoracionesAsesor = valoracionRepository.findBySesionAsesorUsuarioNombreAndSesionFechaHoraBetween(
                     asesorNombre, inicio, fin);
 
-            List<ValoracionDTO> valoracionesDTO = valoracionesAsesor.stream()
+            List<SesionDTO> sesionesDTO = valoracionesAsesor.stream()
                     .map(valoracion -> {
                         SesionDTO sesionDTO = new SesionDTO();
                         sesionDTO.setIdSesion(valoracion.getSesion().getIdSesion());
@@ -103,17 +103,22 @@ public class ReportesService {
                         asesorDTO.setEspecialidad(valoracion.getSesion().getAsesor().getEspecialidad());
                         sesionDTO.setAsesor(asesorDTO);
 
-                        ValoracionDTO valoracionDTO = new ValoracionDTO();
-                        valoracionDTO.setIdValoracion(valoracion.getIdValoracion());
-                        valoracionDTO.setPuntuacion(valoracion.getPuntuacion());
-                        valoracionDTO.setComentario(valoracion.getComentario());
-                        valoracionDTO.setSesion(sesionDTO);
-                        return valoracionDTO;
+                        if (valoracion != null) {
+                            ValoracionDTO valoracionDTO = new ValoracionDTO();
+                            valoracionDTO.setIdValoracion(valoracion.getIdValoracion());
+                            valoracionDTO.setPuntuacion(valoracion.getPuntuacion());
+                            valoracionDTO.setComentario(valoracion.getComentario());
+                            sesionDTO.setValoracion(valoracionDTO);
+                        }
+
+                        return sesionDTO;
                     })
                     .collect(Collectors.toList());
-            detallesAsesor.put("valoraciones", valoracionesDTO);
+
+            detallesAsesor.put("sesiones", sesionesDTO); 
         }
 
         return rendimientoMap;
     }
+
 }

@@ -6,7 +6,7 @@ public class SesionDTO {
     private Integer idSesion;
     private LocalDateTime fechaHora;
     private AsesorDTO asesor;
-    
+    private ValoracionDTO valoracion;
 	public Integer getIdSesion() {
 		return idSesion;
 	}
@@ -25,13 +25,20 @@ public class SesionDTO {
 	public void setAsesor(AsesorDTO asesor) {
 		this.asesor = asesor;
 	}
-	public SesionDTO(Integer idSesion, LocalDateTime fechaHora, AsesorDTO asesor) {
+	public ValoracionDTO getValoracion() {
+		return valoracion;
+	}
+	public void setValoracion(ValoracionDTO valoracion) {
+		this.valoracion = valoracion;
+	}
+	public SesionDTO(Integer idSesion, LocalDateTime fechaHora, AsesorDTO asesor, ValoracionDTO valoracion) {
 		this.idSesion = idSesion;
 		this.fechaHora = fechaHora;
 		this.asesor = asesor;
+		this.valoracion = valoracion;
 	}
 	public SesionDTO() {
 
 	}
-  
+    
 }
