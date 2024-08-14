@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.validation.ObjectError;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "sesion")
 public class Sesion {
@@ -27,6 +29,7 @@ public class Sesion {
     private EstadoSesion estado;
     
     @OneToOne(mappedBy = "sesion")
+    @JsonIgnore
     private Valoracion valoracion;
     
     private String urlJitsi;

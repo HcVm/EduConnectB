@@ -20,7 +20,7 @@ public class WsConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
     	registry.addEndpoint("/ws")
-		        .setAllowedOrigins("https://educonnect-web.pages.dev/", "https://educonnect-wdc.pages.dev")
+		        .setAllowedOrigins("https://educonnect-web.pages.dev/","http://localhost:5173/", "https://educonnect-wdc.pages.dev")
 		        .withSockJS();
     }
 }
