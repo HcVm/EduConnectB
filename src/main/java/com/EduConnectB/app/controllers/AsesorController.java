@@ -113,10 +113,10 @@ public class AsesorController extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
 
         if (!tienePermisoParaSesion(sesion, usuarioAutenticado)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para cancelar esta sesión.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para finalizar esta sesión.");
         }
 
-        sesionService.cancelarSesion(idSesion, usuarioAutenticado);
+        sesionService.finalizarSesion(idSesion, usuarioAutenticado);
         return ResponseEntity.noContent().build();
     }
     
