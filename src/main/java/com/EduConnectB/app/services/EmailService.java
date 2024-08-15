@@ -5,6 +5,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.EduConnectB.app.models.Asesor;
@@ -19,7 +20,7 @@ public class EmailService {
 	@Autowired
     private JavaMailSender mailSender;
 
-	
+	@Async
 	public void enviarCorreoRestablecimientoContrasena(Usuario usuario) {
 	    try {
 	        MimeMessage message = mailSender.createMimeMessage();
@@ -59,6 +60,7 @@ public class EmailService {
 	    }
 	}
 	
+	@Async
 	public void enviarCorreoConfirmacionEstudiante(Usuario usuario) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -102,7 +104,9 @@ public class EmailService {
             e.printStackTrace(); 
         }
     }
-
+	
+	
+	@Async
     public void enviarCorreoConfirmacionAsesor(Asesor asesor) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -143,6 +147,7 @@ public class EmailService {
         }
     }
     
+	@Async
     public void sendSimpleMessage(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
