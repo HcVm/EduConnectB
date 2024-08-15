@@ -150,6 +150,18 @@ public class SesionService {
     }
     
     @Transactional
+    public void finalizarSesion(Integer idSesion, Usuario usuarioAutenticado) {
+        Sesion sesion = sesionRepository.findById(idSesion)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+
+        if (sesion.getUsuario().equals(usuarioAutenticado) || 
+            sesion.getAsesor().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
+            sesion.setEstado(EstadoSesion.FINALIZADA);
+            sesionRepository.save(sesion);
+        }
+    }
+    
+    @Transactional
     public void cancelarSesion(Integer idSesion, Usuario usuarioAutenticado) {
         Sesion sesion = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
